@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% load staticfiles %}
+{% load tags %}
+
+{% url 'login' as login_url %}
+{% url 'logout' as logout_url %}
+{% url 'register' as register_url %}
+{% url 'account_activation_sent' as account_activation_sent_url %}
+
+{% url 'home_page' as home_page_url %}
+
+<head>
+    <title>{% block title %}{% endblock %} | Halanx Affiliate Program</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="shortcut icon" type="image/png" href="{% static "img/favicon.ico" %}">
+
+    <script type="text/javascript" src="{% static "js/jquery.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/jquery-ui.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/bootstrap.min.js" %}"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+    <script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.12.0/jquery.validate.js"></script>
+
+    <script type="text/javascript" src="{% static "js/csrf.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/utils.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/ajax_utils.js" %}"></script>
+
+    <link rel="stylesheet" href="{% static "css/jquery-ui.css" %}">
+    <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
+    <link rel="stylesheet" href="{% static "css/main.css" %}">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css">
+</head>
+
+
+{% block style %}
+{% endblock %}
+
+<body>
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            <a class="navbar-brand" href="{{ home_page_url }}">
+                <img src="{% static "img/halanx.png" %}" style="display: inline-block; height: 30px; margin-top: -5px; vertical-align:middle;">
+                Halanx Affiliate Program</a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                {% if request.user.is_authenticated %}
+                <ul class="nav navbar-nav">
+                    <li class="{% active request home_page_url %}"><a href="{{ home_page_url }}">Home</a></li>
+                </ul>
+                {% endif %}
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#">Hi, {% if request.user.is_authenticated %}{{ request.user.first_name }}{% else %}Guest{% endif %}!</a></li>
+                    {% if request.user.is_authenticated %}
+                    <li><a href="{{ logout_url }}"><span><i class="fa fa-sign-out" aria-hidden="true"></i></span>Logout</a></li>
+                    {% else %}
+                    <li><a href="{{ login_url }}"><span><i class="fa fa-sign-in" aria-hidden="true"></i></span>&nbsp;Login</a></li>
+                    <li><a href="{{ register_url }}"><span><i class="fa fa-user-plus" aria-hidden="true"></i></span>&nbsp;Register</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top:10vh">
+        <h1 style="text-align: center;">{% block heading %}{% endblock %}</h1>
+        {% block main %}
+        {% endblock %}
+    </div>
+
+    <div id="ajaxLoad">
+    </div>
+
+</body>
+
+<script>
+    $(document).ready(function () {
+        $('.visibility_toggle').click(function () {
+            let ele = $($(this).attr('data-container-id').split(',').map(x => '#'+x).join());
+            ele.toggle();
+            if($(this).prop('tagName') === 'I') {
+                ele.trigger('isVisible');
+                if($(this).attr('class').includes('plus')) {
+                    $(this).attr('class', 'fa fa-minus-circle visibility_toggle');
+                } else {
+                    $(this).attr('class', 'fa fa-plus-circle visibility_toggle');
+                }
+            }
+         });
+    });
+</script>
+
+{% block script %}
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Register
+{% endblock %}
+
+{% block heading %}
+Halanx Affiliate Program Registration
+<hr>
+{% endblock %}
+
+
+{% block main %}
+    <div class="container">
+        <br>
+        <form id="registration_form" class="form-horizontal" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <div class="col-sm-3 col-sm-offset-3" style="margin-bottom: 10px;">
+                    <input type="text" placeholder="First Name" name="first_name" required>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" placeholder="Last Name" name="last_name" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-3 col-sm-offset-3" style="margin-bottom: 10px;">
+                    <input type="email" placeholder="Email" name="email" required>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" placeholder="Phone Number" name="phone_no">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-3 col-sm-offset-3" style="margin-bottom: 10px;">
+                    <input type="password" placeholder="Password" name="password" id="password" required>
+                </div>
+                <div class="col-sm-3">
+                    <input type="password" placeholder="Confirm Password" name="confirm_password"
+                           id="confirm_password" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-offset-3">
+                    <p id="registration_error" class="label label-danger"></p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-offset-5 col-sm-2">
+                    <button type="submit" class="btn btn-primary btn-block">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block script %}
+<script>
+    $('#registration_form').submit(function (e) {
+        e.preventDefault();
+
+        $.validator.setDefaults({
+            debug: true,
+            success: "valid"
+        });
+
+
+
+        $(this).validate({
+            rules: {
+                password: {
+                    required: true,
+                    minlength: 6,
+                    maxlength: 10,
+                },
+                confirm_password: {
+                    equalTo: "#password",
+                    minlength: 6,
+                    maxlength: 10
+                }
+            }
+        });
+
+        let form = $(this);
+        let url = form.attr('action');
+        let data = form.serialize();
+
+        if(form.valid() && form.valid()) {
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: data,
+                success: function (data) {
+                    location.href = "{{ account_activation_sent_url }}";
+                },
+                error: function( jqXhr, textStatus, errorThrown ){
+                    $('#registration_error').html(jqXhr.responseJSON['error']);
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

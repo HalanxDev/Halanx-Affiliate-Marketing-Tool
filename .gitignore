@@ -1,0 +1,6 @@
+venv/
+myvenv/
+.idea/
+db.sqlite3
+*.pyc
+static_root/
