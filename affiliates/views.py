@@ -62,13 +62,16 @@ def login_view(request):
                 error_msg = 'You are not an Affiliate.'
         else:
             error_msg = 'Either the email ID or the password is incorrect!'
-    return render(request, 'login.html', {'error': error_msg})
+    return render(request, 'account/login.html', {'error': error_msg})
 
 
 @require_http_methods(['GET', 'POST'])
 def register_view(request):
+    if request.user.is_authenticated:
+        return redirect('home_page')
+
     if request.method == 'GET':
-        return render(request, 'register.html')
+        return render(request, 'account/register.html')
     elif request.method == 'POST':
         data = request.POST
         email = data.get('email')
@@ -84,7 +87,9 @@ def register_view(request):
                                         existing_codes=User.objects.values_list('username', flat=True))
         try:
             user = User.objects.create(username=username, first_name=first_name, last_name=last_name,
-                                       email=email, password=password)
+                                       email=email)
+            user.set_password(password)
+            user.save()
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
@@ -103,7 +108,7 @@ def register_view(request):
 
         # send account verification link
         current_site = get_current_site(request)
-        message = render_to_string('account_activation_email.html', {
+        message = render_to_string('account/account_activation_email.html', {
             'user': user,
             'domain': current_site.domain,
             'uid': urlsafe_base64_encode(force_bytes(user.pk)),
@@ -111,7 +116,7 @@ def register_view(request):
         })
         send_account_verification_email(user.email, message)
 
-        return redirect('account_activation_sent')
+        return JsonResponse({'detail': 'done'})
 
 
 @affiliate_login_required
@@ -127,13 +132,13 @@ def change_password_view(request):
             messages.error(request, 'Please correct the error below.')
     else:
         form = PasswordChangeForm(request.user)
-    return render(request, 'change_password.html', {
+    return render(request, 'account/change_password.html', {
         'form': form
     })
 
 
 def account_activation_sent(request):
-    return render(request, 'account_activation_sent.html')
+    return render(request, 'account/account_activation_sent.html')
 
 
 def activate(request, uidb64, token):
@@ -150,7 +155,7 @@ def activate(request, uidb64, token):
         login(request, user)
         return redirect('home_page')
     else:
-        return render(request, 'account_activation_invalid.html')
+        return render(request, 'account/account_activation_invalid.html')
 
 
 class CustomPasswordResetForm(PasswordResetForm):
@@ -167,3 +172,11 @@ class CustomPasswordResetView(PasswordResetView):
 @require_http_methods(['GET'])
 def home_page(request):
     return render(request, 'home.html')
+
+
+@affiliate_login_required
+@require_http_methods(['GET', 'POST'])
+def profile_view(request):
+    affiliate = Affiliate.objects.get(user=request.user)
+    if request.method == 'GET':
+        return render(request, 'profile.html', {'affiliate': affiliate})

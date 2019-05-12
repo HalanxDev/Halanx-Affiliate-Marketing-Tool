@@ -10,6 +10,7 @@
 {% url 'account_activation_sent' as account_activation_sent_url %}
 
 {% url 'home_page' as home_page_url %}
+{% url 'profile_view' as profile_url %}
 
 <head>
     <title>{% block title %}{% endblock %} | Halanx Affiliate Program</title>
@@ -61,7 +62,7 @@
                 </ul>
                 {% endif %}
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#">Hi, {% if request.user.is_authenticated %}{{ request.user.first_name }}{% else %}Guest{% endif %}!</a></li>
+                    <li><a href="{{ profile_url }}">Hi, {% if request.user.is_authenticated %}{{ request.user.first_name }}{% else %}Guest{% endif %}!</a></li>
                     {% if request.user.is_authenticated %}
                     <li><a href="{{ logout_url }}"><span><i class="fa fa-sign-out" aria-hidden="true"></i></span>Logout</a></li>
                     {% else %}
