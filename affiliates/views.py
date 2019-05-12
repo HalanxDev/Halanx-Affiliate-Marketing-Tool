@@ -85,6 +85,8 @@ def register_view(request):
         phone_no = data.get('phone_no')
         username = generate_random_code(initials=first_name.lower(), n=3, alphabets=False,
                                         existing_codes=User.objects.values_list('username', flat=True))
+
+        # create user
         try:
             user = User.objects.create(username=username, first_name=first_name, last_name=last_name,
                                        email=email)
@@ -93,18 +95,8 @@ def register_view(request):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
+        # create affiliate account
         Affiliate.objects.create(user=user, phone_no=phone_no)
-
-        # address = data.get('address')
-        # occupation = data.get('occupation')
-        # organisation_type = data.get('organisation_type')
-        # organisation_name = data.get('organisation_name')
-        # organisation_address = data.get('organisation_address')
-        #
-        # organisation = Organisation.objects.get_or_create(type=organisation_type, name=organisation_name,
-        #                                                   address=organisation_address)
-        # affiliate.organisation = organisation
-        # affiliate.save()
 
         # send account verification link
         current_site = get_current_site(request)
@@ -180,3 +172,35 @@ def profile_view(request):
     affiliate = Affiliate.objects.get(user=request.user)
     if request.method == 'GET':
         return render(request, 'profile.html', {'affiliate': affiliate})
+    else:
+        data = request.POST
+        affiliate.user.first_name = data.get('first_name')
+        affiliate.user.last_name = data.get('last_name')
+        affiliate.user.save()
+
+        affiliate.phone_no = data.get('phone_no')
+        affiliate.occupation = data.get('occupation')
+        affiliate.save()
+
+        affiliate.address.street_address = data.get('street_address')
+        affiliate.address.city = data.get('city')
+        affiliate.address.pincode = data.get('pincode')
+        affiliate.address.state = data.get('state')
+        affiliate.address.country = data.get('country')
+        affiliate.address.save()
+
+        affiliate.organisation.name = data.get('organisation_name')
+        affiliate.organisation.type = data.get('organisation_type')
+        affiliate.organisation.website = data.get('organisation_website')
+        affiliate.organisation.save()
+
+        affiliate.organisation.address.street_address = data.get('organisation_street_address')
+        affiliate.organisation.address.city = data.get('organisation_city')
+        affiliate.organisation.address.pincode = data.get('organisation_pincode')
+        affiliate.organisation.address.state = data.get('organisation_state')
+        affiliate.organisation.address.country = data.get('organisation_country')
+        affiliate.organisation.address.save()
+        affiliate.organisation.address.save()
+
+        msg = "Your details have been saved successfully!"
+        return render(request, 'profile.html', {'affiliate': affiliate, 'msg': msg})
