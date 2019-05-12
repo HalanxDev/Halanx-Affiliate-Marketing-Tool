@@ -1,9 +1,13 @@
-from django.contrib.auth import logout, authenticate, login, get_user_model
+from django.contrib import messages
+from django.contrib.auth import logout, authenticate, login, get_user_model, update_session_auth_hash
 from django.contrib.auth.decorators import user_passes_test, login_required
+from django.contrib.auth.forms import PasswordResetForm, PasswordChangeForm
 from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.views import PasswordResetView
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
+from django.template import loader
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.encoding import force_bytes, force_text
@@ -12,7 +16,7 @@ from django.views.decorators.http import require_http_methods
 
 from affiliates.models import Affiliate
 from affiliates.tokens import account_activation_token
-from affiliates.utils import send_account_verification_email
+from affiliates.utils import send_account_verification_email, send_password_reset_email
 from utility.random_utils import generate_random_code
 
 LOGIN_URL = '/login/'
@@ -110,6 +114,24 @@ def register_view(request):
         return redirect('account_activation_sent')
 
 
+@affiliate_login_required
+def change_password_view(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('change_password')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'change_password.html', {
+        'form': form
+    })
+
+
 def account_activation_sent(request):
     return render(request, 'account_activation_sent.html')
 
@@ -129,6 +151,17 @@ def activate(request, uidb64, token):
         return redirect('home_page')
     else:
         return render(request, 'account_activation_invalid.html')
+
+
+class CustomPasswordResetForm(PasswordResetForm):
+    def send_mail(self, subject_template_name, email_template_name,
+                  context, from_email, to_email, html_email_template_name=None):
+        body = loader.render_to_string(email_template_name, context)
+        send_password_reset_email(to_email, body)
+
+
+class CustomPasswordResetView(PasswordResetView):
+    form_class = CustomPasswordResetForm
 
 
 @require_http_methods(['GET'])

@@ -77,3 +77,5 @@ USE_L10N = False
 USE_TZ = True
 
 SITE_ID = 1
+
+LOGIN_URL = '/login/'
