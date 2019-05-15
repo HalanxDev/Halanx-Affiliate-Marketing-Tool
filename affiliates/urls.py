@@ -20,4 +20,6 @@ urlpatterns = [
     url(r'^reset/done/$', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 
     url(r'^profile/$', views.profile_view, name='profile_view'),
+
+    url(r'^widgets/data.js', views.test_view),
 ]

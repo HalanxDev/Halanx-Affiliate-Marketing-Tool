@@ -22,7 +22,8 @@ My Profile<hr>
     <div class="container">
 
         {% if msg %}
-            <div class="alert alert-success" role="alert">
+            <div class="alert alert-success alert-dismissible" role="alert">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
                 {{ msg }}
             </div>
         {% endif %}
@@ -91,7 +92,12 @@ My Profile<hr>
             <div class="form-group">
                 <div class="control-label col-sm-2">Occupation</div>
                 <div class="col-sm-4">
-                    <input type="text" name="occupation" value="{{ affiliate.occupation|default_if_none:"" }}">
+                    <select name="occupation">
+                        <option disabled selected>-----------------------------------</option>
+                        {% for category in occupation_categories %}
+                        <option value="{{ category }}" {% if affiliate.occupation.name == category %}selected{% endif %}>{{ category }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
             </div>
 
@@ -108,7 +114,12 @@ My Profile<hr>
                 </div>
                 <div class="control-label col-sm-1">Type</div>
                 <div class="col-sm-3">
-                    <input type="text" name="organisation_type" value="{{ affiliate.organisation.type|default_if_none:"" }}">
+                    <select name="organisation_type">
+                        <option disabled selected>-----------------------------------</option>
+                        {% for category in organisation_type_categories %}
+                        <option value="{{ category }}" {% if affiliate.organisation.type.name == category %}selected{% endif %}>{{ category }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
             </div>
 

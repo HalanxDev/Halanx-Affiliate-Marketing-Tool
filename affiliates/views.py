@@ -1,3 +1,5 @@
+import json
+
 from django.contrib import messages
 from django.contrib.auth import logout, authenticate, login, get_user_model, update_session_auth_hash
 from django.contrib.auth.decorators import user_passes_test, login_required
@@ -5,7 +7,7 @@ from django.contrib.auth.forms import PasswordResetForm, PasswordChangeForm
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.views import PasswordResetView
 from django.contrib.sites.shortcuts import get_current_site
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.template import loader
 from django.template.loader import render_to_string
@@ -14,7 +16,7 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views.decorators.http import require_http_methods
 
-from affiliates.models import Affiliate
+from affiliates.models import Affiliate, AffiliateOccupationCategory, AffiliateOrganisationTypeCategory
 from affiliates.tokens import account_activation_token
 from affiliates.utils import send_account_verification_email, send_password_reset_email
 from utility.random_utils import generate_random_code
@@ -170,8 +172,11 @@ def home_page(request):
 @require_http_methods(['GET', 'POST'])
 def profile_view(request):
     affiliate = Affiliate.objects.get(user=request.user)
+    metadata = {'occupation_categories': AffiliateOccupationCategory.objects.values_list('name', flat=True),
+                'organisation_type_categories': AffiliateOrganisationTypeCategory.objects.values_list('name', flat=True)}
+
     if request.method == 'GET':
-        return render(request, 'profile.html', {'affiliate': affiliate})
+        return render(request, 'profile.html', {'affiliate': affiliate, **metadata})
     else:
         data = request.POST
         affiliate.user.first_name = data.get('first_name')
@@ -179,7 +184,7 @@ def profile_view(request):
         affiliate.user.save()
 
         affiliate.phone_no = data.get('phone_no')
-        affiliate.occupation = data.get('occupation')
+        affiliate.occupation = AffiliateOccupationCategory.objects.filter(name=data.get('occupation')).first()
         affiliate.save()
 
         affiliate.address.street_address = data.get('street_address')
@@ -190,7 +195,8 @@ def profile_view(request):
         affiliate.address.save()
 
         affiliate.organisation.name = data.get('organisation_name')
-        affiliate.organisation.type = data.get('organisation_type')
+        affiliate.organisation.type = AffiliateOrganisationTypeCategory.objects.filter(
+            name=data.get('organisation_type')).first()
         affiliate.organisation.website = data.get('organisation_website')
         affiliate.organisation.save()
 
@@ -203,4 +209,10 @@ def profile_view(request):
         affiliate.organisation.address.save()
 
         msg = "Your details have been saved successfully!"
-        return render(request, 'profile.html', {'affiliate': affiliate, 'msg': msg})
+        return render(request, 'profile.html', {'affiliate': affiliate, 'msg': msg, **metadata})
+
+
+def test_view(request):
+    html = render_to_string('search.html')
+    data = request.GET.get('callback', '') + "(" + json.dumps({'html': html}) + ")"
+    return HttpResponse(data, content_type="text/javascript")

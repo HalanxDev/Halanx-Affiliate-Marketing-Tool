@@ -2,10 +2,6 @@ from decouple import config
 from sendgrid import sendgrid
 from sendgrid.helpers.mail import Mail
 
-ORGANISATION_TYPE_CATEGORIES = []
-
-AFFILIATE_OCCUPATION_CATEGORIES = []
-
 
 def send_account_verification_email(email, message):
     sg = sendgrid.SendGridAPIClient(api_key=config("SENDGRID_API_KEY"))
