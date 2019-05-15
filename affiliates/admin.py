@@ -2,7 +2,18 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
-from affiliates.models import Affiliate, AffiliateAddress, AffiliateOrganisation, AffiliateOrganisationAddress
+from affiliates.models import Affiliate, AffiliateAddress, AffiliateOrganisation, AffiliateOrganisationAddress, \
+    AffiliateOccupationCategory, AffiliateOrganisationTypeCategory
+
+
+@admin.register(AffiliateOccupationCategory)
+class AffiliateOccupationCategoryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', )
+
+
+@admin.register(AffiliateOrganisationTypeCategory)
+class AffiliateOrganisationTypeCategoryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', )
 
 
 class AffiliateAddressInline(admin.StackedInline):

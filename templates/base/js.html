@@ -1,0 +1,19 @@
+{% load static %}
+
+<!-- Bootstrap and necessary plugins -->
+<script src="{% static 'vendors/js/jquery.min.js' %}"></script>
+<script src="{% static 'vendors/js/popper.min.js' %}"></script>
+<script src="{% static 'vendors/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'vendors/js/pace.min.js' %}"></script>
+
+<!-- CoreUI main scripts -->
+<script src="{% static 'coreui/js/app.js' %}"></script>
+
+<!-- Custom scripts required by this view -->
+<script src="{% static 'coreui/js/views/main.js' %}"></script>
+<script type="text/javascript" src="{% static "main/js/csrf.js" %}"></script>
+<script type="text/javascript" src="{% static "main/js/utils.js" %}"></script>
+<script type="text/javascript" src="{% static "main/js/ajax_utils.js" %}"></script>
+
+{% block script %}
+{% endblock %}

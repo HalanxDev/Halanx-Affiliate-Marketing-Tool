@@ -1,0 +1,42 @@
+{% load static %}
+<header class="app-header navbar">
+    <button class="navbar-toggler mobile-sidebar-toggler d-lg-none mr-auto" type="button">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <a class="navbar-brand" href="{{ home_page_url }}">
+        <img src="{% static "img/halanx.png" %}" style="display: inline-block; height: 30px; margin-top: -5px; vertical-align:middle;">
+        Halanx Affiliate Program
+    </a>
+
+    <ul class="nav navbar-nav ml-auto" style="margin-right: 10px;">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button"
+               aria-haspopup="true" aria-expanded="false">
+                <img src="{% static 'src/img/avatars/6.jpg' %}" class="img-avatar">
+                <div class="d-none d-lg-inline">
+                    <span>Hi, {% if request.user.is_authenticated %}{{ request.user.first_name }}{% else %}Guest{% endif %}!</span>
+                </div>
+            </a>
+            {% if request.user.is_authenticated %}
+            <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" href="{{ profile_url }}"><i class="fa fa-user"></i> Profile</a>
+                <a class="dropdown-item" href="{{ logout_url }}"><i class="fa fa-lock"></i> Logout</a>
+            </div>
+            {% else %}
+            <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" href="{{ login_url }}"><i class="fa fa-sign-in"></i> Login</a>
+                <a class="dropdown-item" href="{{ register_url }}"><i class="fa fa-user-plus"></i> Register</a>
+            </div>
+            {% endif %}
+        </li>
+    </ul>
+
+    {% block navbar %}
+    {% endblock %}
+
+</header>

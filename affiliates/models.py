@@ -1,9 +1,12 @@
 from django.conf import settings
+from django.core.files.base import ContentFile
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from affiliates.utils import get_affiliate_qr_code_upload_path
 from common.models import AddressDetail
+from utility.qrcode_utils import generate_qr_code
 from utility.random_utils import generate_random_code
 
 
@@ -27,6 +30,7 @@ class Affiliate(models.Model):
     occupation = models.ForeignKey('AffiliateOccupationCategory', blank=True, null=True, on_delete=models.SET_NULL,
                                    related_name='affiliates')
     unique_code = models.CharField(max_length=100, blank=True, null=True)
+    qr_code = models.ImageField(upload_to=get_affiliate_qr_code_upload_path, null=True, blank=True)
     active = models.BooleanField(default=True)
     verified = models.BooleanField(default=False)
 
@@ -40,6 +44,9 @@ class Affiliate(models.Model):
             self.unique_code = generate_random_code(initials=self.user.first_name.lower(), n=3,
                                                     existing_codes=existing_codes)
         super(Affiliate, self).save(*args, **kwargs)
+
+    def generate_qr_code(self):
+        self.qr_code.save(None, content=ContentFile(generate_qr_code("https://www.halanx.com").getvalue()))
 
     # noinspection PyUnresolvedReferences
     @property

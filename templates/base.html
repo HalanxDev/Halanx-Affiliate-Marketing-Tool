@@ -24,8 +24,10 @@
     <script type="text/javascript" src="{% static "js/bootstrap.min.js" %}"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
-    <script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.12.0/jquery.validate.js"></script>
+    <script type="text/javascript"
+            src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+    <script type="text/javascript"
+            src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.12.0/jquery.validate.js"></script>
 
     <script type="text/javascript" src="{% static "js/csrf.js" %}"></script>
     <script type="text/javascript" src="{% static "js/utils.js" %}"></script>
@@ -43,6 +45,7 @@
 {% endblock %}
 
 <body>
+
     <nav class="navbar navbar-default navbar-fixed-top">
         <div class="container-fluid">
             <div class="navbar-header">
@@ -67,40 +70,24 @@
                     <li><a href="{{ logout_url }}"><span><i class="fa fa-sign-out" aria-hidden="true"></i></span>Logout</a></li>
                     {% else %}
                     <li><a href="{{ login_url }}"><span><i class="fa fa-sign-in" aria-hidden="true"></i></span>&nbsp;Login</a></li>
-                    <li><a href="{{ register_url }}"><span><i class="fa fa-user-plus" aria-hidden="true"></i></span>&nbsp;Register</a></li>
+                    <li><a href="{{ register_url }}"><span><i class="fa fa-user-plus" aria-hidden="true"></i></span>
+    &nbsp;Register</a></li>
                     {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
 
-    <div class="container" style="padding-top:10vh">
-        <h1 style="text-align: center;">{% block heading %}{% endblock %}</h1>
-        {% block main %}
-        {% endblock %}
-    </div>
+<div class="container" style="padding-top:10vh">
+    <h1 style="text-align: center;">{% block heading %}{% endblock %}</h1>
+    {% block main %}
+    {% endblock %}
+</div>
 
-    <div id="ajaxLoad">
-    </div>
+
 
 </body>
 
-<script>
-    $(document).ready(function () {
-        $('.visibility_toggle').click(function () {
-            let ele = $($(this).attr('data-container-id').split(',').map(x => '#'+x).join());
-            ele.toggle();
-            if($(this).prop('tagName') === 'I') {
-                ele.trigger('isVisible');
-                if($(this).attr('class').includes('plus')) {
-                    $(this).attr('class', 'fa fa-minus-circle visibility_toggle');
-                } else {
-                    $(this).attr('class', 'fa fa-plus-circle visibility_toggle');
-                }
-            }
-         });
-    });
-</script>
 
 {% block script %}
 {% endblock %}
