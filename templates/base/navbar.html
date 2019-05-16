@@ -18,7 +18,7 @@
             <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button"
                aria-haspopup="true" aria-expanded="false">
                 {% if request.user.is_authenticated %}
-                <img src="{{ affiliate.profile_pic_url }}" class="img-avatar">
+                <img src="{{ request.user.affiliate.profile_pic_url }}" class="img-avatar">
                 {% else %}
                 <img src="{% static 'img/default-user.png' %}" class="img-avatar">
                 {% endif %}

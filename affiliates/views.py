@@ -1,5 +1,7 @@
 import json
+from datetime import timedelta
 
+from decouple import config
 from django.contrib import messages
 from django.contrib.auth import logout, authenticate, login, get_user_model, update_session_auth_hash
 from django.contrib.auth.decorators import user_passes_test, login_required
@@ -12,6 +14,7 @@ from django.shortcuts import render, redirect
 from django.template import loader
 from django.template.loader import render_to_string
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views.decorators.http import require_http_methods
@@ -20,6 +23,9 @@ from affiliates.models import Affiliate, AffiliateOccupationCategory, AffiliateO
     AffiliatePicture
 from affiliates.tokens import account_activation_token
 from affiliates.utils import send_account_verification_email, send_password_reset_email
+from referrals.models import TenantReferral, HouseOwnerReferral
+from referrals.utils import TENANT_REFERRAL, DASHBOARD_FORM_SOURCE, HOUSE_OWNER_REFERRAL
+from utility.form_field_utils import get_number, get_datetime
 from utility.random_utils import generate_random_code
 
 LOGIN_URL = '/login/'
@@ -166,14 +172,7 @@ class CustomPasswordResetView(PasswordResetView):
 
 @require_http_methods(['GET'])
 def home_page(request):
-    try:
-        if request.user.is_authenticated:
-            affiliate = Affiliate.objects.get(user=request.user)
-        else:
-            affiliate = None
-    except Affiliate.DoesNotExist:
-        return render(request, 'home.html')
-    return render(request, 'home.html', {'affiliate': affiliate})
+    return render(request, 'home.html')
 
 
 @affiliate_login_required
@@ -233,6 +232,56 @@ def profile_view(request):
             msg = "Your details have been saved successfully!"
 
         return render(request, 'profile.html', {'affiliate': affiliate, 'msg': msg, **metadata})
+
+
+@affiliate_login_required
+@require_http_methods(['GET', 'POST'])
+def referral_upload_view(request):
+    affiliate = Affiliate.objects.get(user=request.user)
+    referral_type = request.GET.get('type')
+    metadata = {'referral_type': referral_type,
+                'GOOGLE_MAPS_API_KEY': config('GOOGLE_MAPS_API_KEY')}
+    if request.method == 'GET':
+        return render(request, 'referral_upload.html', metadata)
+    else:
+        data = request.POST
+        name = data.get('name')
+        phone_no = data.get('phone_no')
+        gender = data.get('gender')
+        email = data.get('email')
+
+        error = None
+        msg = None
+
+        if referral_type == TENANT_REFERRAL:
+            if TenantReferral.objects.filter(affiliate=affiliate, phone_no=phone_no,
+                                             timestamp__lte=timezone.now()-timedelta(days=30)).exists():
+                error = "Duplicate Tenant Referral!"
+            else:
+                preferred_location = data.get('preferred_location')
+                expected_rent = get_number(data.get('expected_rent'))
+                expected_movein_date = get_datetime(data.get('expected_movein_date'))
+                accomodation_for = data.get('accomodation_for')
+                accomodation_type = data.get('accomodation_type')
+                TenantReferral.objects.create(affiliate=affiliate, name=name, phone_no=phone_no, gender=gender, email=email,
+                                              preferred_location=preferred_location, expected_rent=expected_rent,
+                                              expected_movein_date=expected_movein_date,
+                                              accomodation_for=accomodation_for, accomodation_type=accomodation_type,
+                                              source=DASHBOARD_FORM_SOURCE)
+                msg = "Referral was submitted successfully."
+        elif referral_type == HOUSE_OWNER_REFERRAL:
+            if HouseOwnerReferral.objects.filter(affiliate=affiliate, phone_no=phone_no,
+                                                 timestamp__lte=timezone.now()-timedelta(days=30)).exists():
+                error = "Duplicate House Owner Referral!"
+            else:
+                house_address = data.get('house_address')
+                house_type = data.get('house_type')
+                bhk_count = data.get('bhk_count')
+                HouseOwnerReferral.objects.create(affiliate=affiliate, name=name, phone_no=phone_no, gender=gender,
+                                                  email=email, house_address=house_address, bhk_count=bhk_count,
+                                                  house_type=house_type, source=DASHBOARD_FORM_SOURCE)
+                msg = "Referral was submitted successfully."
+        return render(request, 'referral_upload.html', {'msg': msg, 'error': error, **metadata})
 
 
 def test_view(request):

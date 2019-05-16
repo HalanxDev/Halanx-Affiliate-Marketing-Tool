@@ -3,7 +3,30 @@
     <nav class="sidebar-nav">
         <ul class="nav">
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'home_page' %}"><i class="icon-speedometer"></i> Dashboard</a>
+                <a class="nav-link" href="{% url 'home_page' %}">
+                    <i class="icon-speedometer"></i>
+                    Dashboard
+                </a>
+            </li>
+
+            <li class="nav-item nav-dropdown">
+                <a class="nav-link nav-dropdown-toggle" href="#">
+                    <i class="nav-icon fa fa-upload"></i> Upload Referrals
+                </a>
+                <ul class="nav-dropdown-items">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ referral_upload_url }}?type=tenant">
+                            <i class="nav-icon cui-puzzle"></i>
+                            <span style="font-size: small">Tenant Referrals</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ referral_upload_url }}?type=house_owner">
+                            <i class="nav-icon cui-puzzle"></i>
+                            <span style="font-size: small">House Owner Referrals</span>
+                        </a>
+                    </li>
+                </ul>
             </li>
         </ul>
     </nav>

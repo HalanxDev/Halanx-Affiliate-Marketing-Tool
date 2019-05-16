@@ -68,12 +68,18 @@ class AffiliateOrganisationAddress(AddressDetail):
 class AffiliateOccupationCategory(models.Model):
     name = models.CharField(max_length=500, blank=True, null=True)
 
+    class Meta:
+        verbose_name_plural = "Affiliate occupation categories"
+
     def __str__(self):
         return self.name
 
 
 class AffiliateOrganisationTypeCategory(models.Model):
     name = models.CharField(max_length=500, blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = "Affiliate organisation type categories"
 
     def __str__(self):
         return self.name

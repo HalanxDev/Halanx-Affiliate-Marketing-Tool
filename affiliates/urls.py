@@ -21,5 +21,7 @@ urlpatterns = [
 
     url(r'^profile/$', views.profile_view, name='profile_view'),
 
+    url(r'^referrals/upload/$', views.referral_upload_view, name='referral_upload_view'),
+
     url(r'^widgets/data.js', views.test_view),
 ]

@@ -1,3 +1,7 @@
+TENANT_REFERRAL = "tenant"
+HOUSE_OWNER_REFERRAL = "house_owner"
+
+
 GenderChoices = (
     ("male", "Male"),
     ("female", "Female"),
@@ -23,6 +27,16 @@ HouseAccomodationTypeCategories = (
     (SHARED_ROOM, 'Shared rooms'),
     (PRIVATE_ROOM, 'Private rooms'),
     (FLAT, 'Entire house'),
+)
+
+APARTMENT = 'apartment'
+INDEPENDENT = 'independent'
+VILLA = 'villa'
+
+HouseTypeCategories = (
+    (APARTMENT, 'Apartment'),
+    (INDEPENDENT, 'Independent House'),
+    (VILLA, 'Villa'),
 )
 
 PENDING = 'pending'

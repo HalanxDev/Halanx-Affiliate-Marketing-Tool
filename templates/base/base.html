@@ -11,6 +11,7 @@
 
 {% url 'home_page' as home_page_url %}
 {% url 'profile_view' as profile_url %}
+{% url 'referral_upload_view' as referral_upload_url %}
 
 <!--Headers-->
 {% include 'base/header.html' %}
@@ -67,6 +68,7 @@
                 <!-- Page contents -->
                 <div class="container-fluid">
                     <div class="animated fadeIn">
+
                         {% block content %}
                         {% endblock %}
                     </div>
