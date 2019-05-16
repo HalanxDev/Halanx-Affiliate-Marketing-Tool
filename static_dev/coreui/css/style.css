@@ -7922,14 +7922,6 @@ base-chart.chart {
 .navbar-divider {
   background-color: rgba(0, 0, 0, 0.075); }
 
-@media (min-width: 992px) {
-  .brand-minimized .app-header.navbar .navbar-brand {
-    width: 50px;
-    background-color: #fff;
-    background-image: url("../img/logo-symbol.png");
-    background-size: 24px;
-    border-bottom: 1px solid #c2cfd6; } }
-
 .progress-xs {
   height: 4px; }
 

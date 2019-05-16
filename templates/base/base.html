@@ -14,6 +14,9 @@
 
 <!--Headers-->
 {% include 'base/header.html' %}
+{% block extraheader %}
+    <title>{% block title %}{% endblock %} | Halanx Affiliate Program</title>
+{% endblock %}
 
 <!--Styles-->
 {% block style %}
@@ -47,7 +50,7 @@
 
 -->
 
-    <body class="app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden footer-fixed">
+    <body class="app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden">
         <!--Navbar-->
         {% include 'base/navbar.html' %}
 

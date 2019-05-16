@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from affiliates.models import Affiliate, AffiliateAddress, AffiliateOrganisation, AffiliateOrganisationAddress, \
-    AffiliateOccupationCategory, AffiliateOrganisationTypeCategory
+    AffiliateOccupationCategory, AffiliateOrganisationTypeCategory, AffiliatePicture
 
 
 @admin.register(AffiliateOccupationCategory)
@@ -48,12 +48,20 @@ class AffiliateOrganisationAdmin(admin.ModelAdmin):
     )
 
 
+class AffiliatePictureTabular(admin.TabularInline):
+    model = AffiliatePicture
+    extra = 0
+    ordering = ('-timestamp',)
+
+
 @admin.register(Affiliate)
 class AffiliateAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'occupation', 'organisation_name', 'verified')
+    list_display = ('id', 'name', 'occupation', 'organisation_name', 'get_profile_pic_html', 'verified')
+    readonly_fields = ('get_profile_pic_html',)
     inlines = (
         AffiliateAddressInline,
         AffiliateOrganisationInline,
+        AffiliatePictureTabular,
     )
 
     def get_inline_instances(self, request, obj=None):

@@ -4,7 +4,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
-    <title>{% block title %}{% endblock %} | Halanx Affiliate Program</title>
 
     <!-- Icons -->
     <link href="{% static 'vendors/css/font-awesome.min.css' %}" rel="stylesheet">
@@ -12,6 +11,11 @@
 
     <!-- Main styles for this application -->
     <link href="{% static 'coreui/css/style.css' %}" rel="stylesheet">
+
+    <!-- DataTables -->
+    <link href="{% static "vendors/css/jquery-ui.css" %}" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css" rel="stylesheet">
 
     {% block extrahead %}
     {% endblock %}
