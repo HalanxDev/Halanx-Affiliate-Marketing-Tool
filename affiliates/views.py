@@ -166,7 +166,10 @@ class CustomPasswordResetView(PasswordResetView):
 @require_http_methods(['GET'])
 def home_page(request):
     try:
-        affiliate = Affiliate.objects.get(user=request.user)
+        if request.user.is_authenticated:
+            affiliate = Affiliate.objects.get(user=request.user)
+        else:
+            affiliate = None
     except Affiliate.DoesNotExist:
         return render(request, 'home.html')
     return render(request, 'home.html', {'affiliate': affiliate})

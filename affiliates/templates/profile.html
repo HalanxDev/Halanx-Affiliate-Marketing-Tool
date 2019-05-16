@@ -1,173 +1,212 @@
-{% extends 'base.html' %}
+{% extends 'base/base.html' %}
 
 {% block title %}
-My Profile
+    Profile
 {% endblock %}
 
-{% block heading %}
-My Profile<hr>
-{% endblock %}
+{% block content %}
+    {% if msg %}
+        <div class="alert alert-success alert-dismissible" role="alert">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            {{ msg }}
+        </div>
+    {% endif %}
 
-{% block style %}
-<style>
-    @media only screen and (max-width: 800px) {
-       .mb-10 input {
-            margin-bottom: 10px;
-       }
-    }
-</style>
-{% endblock %}
-
-{% block main %}
-    <div class="container">
-
-        {% if msg %}
-            <div class="alert alert-success alert-dismissible" role="alert">
-                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                {{ msg }}
-            </div>
-        {% endif %}
-
-        <form id="profile_form" class="form-horizontal" method="post">
-            {% csrf_token %}
-            <div class="form-group">
-                <div class="col-sm-6">
-                    <h2>Basic Details</h2>
+    <div class="card" style="width: 100%">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-sm-12">
+                    <h2>Profile</h2>
                 </div>
             </div>
+        </div>
 
-            <div class="form-group">
-                <div class="control-label col-sm-2">First Name</div>
-                <div class="col-sm-3 mb-10">
-                    <input type="text" name="first_name" value="{{ affiliate.user.first_name|default_if_none:"" }}">
+        <div class="card-body">
+            <form id="profile_form" class="form-horizontal" method="post">
+                {% csrf_token %}
+                <div class="form-group mb-s-0">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h3>Basic Details</h3>
+                            <hr>
+                        </div>
+                    </div>
                 </div>
-                <div class="control-label col-sm-2">Last Name</div>
-                <div class="col-sm-3">
-                    <input type="text" name="last_name" value="{{ affiliate.user.last_name|default_if_none:"" }}">
-                </div>
-            </div>
 
-            <div class="form-group">
-                <div class="control-label col-sm-2">Email</div>
-                <div class="col-sm-3 mb-10">
-                    <input type="text" name="email" value="{{ affiliate.user.email|default_if_none:"" }}" readonly>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-form-label col-sm-2">First Name</div>
+                        <div class="col-sm-3 mb-10">
+                            <input type="text" class="form-control" name="first_name"
+                                   value="{{ affiliate.user.first_name|default_if_none:"" }}">
+                        </div>
+                        <div class="col-form-label col-sm-2 offset-sm-1">Last Name</div>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control" name="last_name"
+                                   value="{{ affiliate.user.last_name|default_if_none:"" }}">
+                        </div>
+                    </div>
                 </div>
-                <div class="control-label col-sm-2">Phone Number</div>
-                <div class="col-sm-3">
-                    <input type="text" name="phone_no" value="{{ affiliate.phone_no|default_if_none:"" }}">
-                </div>
-            </div>
 
-            <div class="form-group">
-                <div class="control-label col-sm-2">Address</div>
-                <div class="col-sm-4">
-                    <input type="text" placeholder="Street Address" name="street_address"
-                           value="{{ affiliate.address.street_address|default_if_none:"" }}">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-form-label col-sm-2">Email</div>
+                        <div class="col-sm-3 mb-10">
+                            <input type="text" class="form-control" name="email"
+                                   value="{{ affiliate.user.email|default_if_none:"" }}" readonly>
+                        </div>
+                        <div class="col-form-label col-sm-2 offset-sm-1">Phone Number</div>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control" name="phone_no"
+                                   value="{{ affiliate.phone_no|default_if_none:"" }}">
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <div class="control-label col-sm-2"></div>
-                <div class="col-sm-2 mb-10">
-                    <input type="text" placeholder="City" name="city" value="{{ affiliate.address.city|default_if_none:"" }}">
+                <div class="form-group mb-s-0">
+                    <div class="row">
+                        <div class="col-form-label col-sm-2">Address</div>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" placeholder="Street Address"
+                                   name="street_address"
+                                   value="{{ affiliate.address.street_address|default_if_none:"" }}">
+                        </div>
+                    </div>
                 </div>
-                <div class="col-sm-2">
-                    <input type="text" placeholder="PinCode" name="pincode"
-                           value="{{ affiliate.address.pincode|default_if_none:"" }}">
-                </div>
-            </div>
 
-            <div class="form-group">
-                <div class="control-label col-sm-2"></div>
-                <div class="col-sm-2 mb-10">
-                    <input type="text" placeholder="State" name="state"
-                           value="{{ affiliate.address.state|default_if_none:"" }}">
+                <div class="form-group mb-s-0">
+                    <div class="row">
+                        <div class="col-form-label col-sm-2"></div>
+                        <div class="col-sm-2 mb-10">
+                            <input type="text" class="form-control" placeholder="City" name="city"
+                                   value="{{ affiliate.address.city|default_if_none:"" }}">
+                        </div>
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control" placeholder="PinCode" name="pincode"
+                                   value="{{ affiliate.address.pincode|default_if_none:"" }}">
+                        </div>
+                    </div>
                 </div>
-                <div class="col-sm-2">
-                    <input type="text" placeholder="Country" name="country"
-                           value="{{ affiliate.address.country|default_if_none:"" }}">
-                </div>
-            </div>
 
-            <div class="form-group">
-                <div class="control-label col-sm-2">Occupation</div>
-                <div class="col-sm-4">
-                    <select name="occupation">
-                        <option disabled selected>-----------------------------------</option>
-                        {% for category in occupation_categories %}
-                        <option value="{{ category }}" {% if affiliate.occupation.name == category %}selected{% endif %}>{{ category }}</option>
-                        {% endfor %}
-                    </select>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-form-label col-sm-2"></div>
+                        <div class="col-sm-2 mb-10">
+                            <input type="text" class="form-control" placeholder="State" name="state"
+                                   value="{{ affiliate.address.state|default_if_none:"" }}">
+                        </div>
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control" placeholder="Country" name="country"
+                                   value="{{ affiliate.address.country|default_if_none:"" }}">
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <div class="col-sm-6">
-                    <h2>Business/Organisation Details</h2>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-form-label col-sm-2">Occupation</div>
+                        <div class="col-sm-4">
+                            <select class="form-control" name="occupation">
+                                <option disabled selected>-----------------------------------</option>
+                                {% for category in occupation_categories %}
+                                    <option value="{{ category }}"
+                                            {% if affiliate.occupation.name == category %}selected{% endif %}>{{ category }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <div class="control-label col-sm-2">Name</div>
-                <div class="col-sm-4 mb-10">
-                    <input type="text" name="organisation_name" value="{{ affiliate.organisation.name|default_if_none:"" }}">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <br>
+                            <h3>Organisation Details</h3>
+                            <hr>
+                        </div>
+                    </div>
                 </div>
-                <div class="control-label col-sm-1">Type</div>
-                <div class="col-sm-3">
-                    <select name="organisation_type">
-                        <option disabled selected>-----------------------------------</option>
-                        {% for category in organisation_type_categories %}
-                        <option value="{{ category }}" {% if affiliate.organisation.type.name == category %}selected{% endif %}>{{ category }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
 
-            <div class="form-group">
-                <div class="control-label col-sm-2">Website</div>
-                <div class="col-sm-4">
-                    <input type="text" name="organisation_website"
-                           value="{{ affiliate.organisation.website|default_if_none:"" }}">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-form-label col-sm-2">Name</div>
+                        <div class="col-sm-4 mb-10">
+                            <input type="text" class="form-control" name="organisation_name"
+                                   value="{{ affiliate.organisation.name|default_if_none:"" }}">
+                        </div>
+                        <div class="col-form-label col-sm-2">Type</div>
+                        <div class="col-sm-3">
+                            <select class="form-control" name="organisation_type">
+                                <option disabled selected>-----------------------------------</option>
+                                {% for category in organisation_type_categories %}
+                                    <option value="{{ category }}"
+                                            {% if affiliate.organisation.type.name == category %}selected{% endif %}>{{ category }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <div class="control-label col-sm-2">Address</div>
-                <div class="col-sm-4">
-                    <input type="text" placeholder="Street Address" name="organisation_street_address"
-                           value="{{ affiliate.organisation.address.street_address|default_if_none:"" }}">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-form-label col-sm-2">Website</div>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="organisation_website"
+                                   value="{{ affiliate.organisation.website|default_if_none:"" }}">
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <div class="control-label col-sm-2"></div>
-                <div class="col-sm-2 mb-10">
-                    <input type="text" placeholder="City" name="organisation_city"
-                           value="{{ affiliate.organisation.address.city|default_if_none:"" }}">
+                <div class="form-group mb-s-0">
+                    <div class="row">
+                        <div class="col-form-label col-sm-2">Address</div>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" placeholder="Street Address"
+                                   name="organisation_street_address"
+                                   value="{{ affiliate.organisation.address.street_address|default_if_none:"" }}">
+                        </div>
+                    </div>
                 </div>
-                <div class="col-sm-2">
-                    <input type="text" placeholder="PinCode" name="organisation_pincode"
-                           value="{{ affiliate.organisation.address.pincode|default_if_none:"" }}">
-                </div>
-            </div>
 
-            <div class="form-group">
-                <div class="control-label col-sm-2"></div>
-                <div class="col-sm-2 mb-10">
-                    <input type="text" placeholder="State" name="organisation_state"
-                           value="{{ affiliate.organisation.address.state|default_if_none:"" }}">
+                <div class="form-group mb-s-0">
+                    <div class="row">
+                        <div class="col-form-label col-sm-2"></div>
+                        <div class="col-sm-2 mb-10">
+                            <input type="text" class="form-control" placeholder="City" name="organisation_city"
+                                   value="{{ affiliate.organisation.address.city|default_if_none:"" }}">
+                        </div>
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control" placeholder="PinCode"
+                                   name="organisation_pincode"
+                                   value="{{ affiliate.organisation.address.pincode|default_if_none:"" }}">
+                        </div>
+                    </div>
                 </div>
-                <div class="col-sm-2">
-                    <input type="text" placeholder="Country" name="organisation_country"
-                           value="{{ affiliate.organisation.address.country|default_if_none:"" }}">
-                </div>
-            </div>
 
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-form-label col-sm-2"></div>
+                        <div class="col-sm-2 mb-10">
+                            <input type="text" class="form-control" placeholder="State" name="organisation_state"
+                                   value="{{ affiliate.organisation.address.state|default_if_none:"" }}">
+                        </div>
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control" placeholder="Country"
+                                   name="organisation_country"
+                                   value="{{ affiliate.organisation.address.country|default_if_none:"" }}">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="card-footer">
             <div class="form-group">
                 <div class="col-sm-offset-5 col-sm-2">
-                    <button type="submit" class="btn btn-primary btn-block">Save</button>
+                    <button type="submit" form="profile_form" class="btn btn-primary btn-block">Save</button>
                 </div>
             </div>
-        </form>
+        </div>
+
     </div>
 {% endblock %}

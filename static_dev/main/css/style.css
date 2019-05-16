@@ -1,0 +1,15 @@
+@media only screen and (max-width: 800px) {
+    .mb-10 input {
+        margin-bottom: 10px;
+    }
+
+    .mb-s-0 {
+        margin-bottom: 0;
+    }
+}
+
+.form-horizontal .control-label {
+    padding-top: 7px;
+    margin-bottom: 0;
+    text-align: right
+}
