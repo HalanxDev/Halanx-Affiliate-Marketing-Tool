@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from affiliates.models import Affiliate, AffiliateAddress, AffiliateOrganisation, AffiliateOrganisationAddress, \
-    AffiliateOccupationCategory, AffiliateOrganisationTypeCategory, AffiliatePicture
+    AffiliateOccupationCategory, AffiliateOrganisationTypeCategory, AffiliatePicture, AffiliateBankDetail
 
 
 @admin.register(AffiliateOccupationCategory)
@@ -18,6 +18,10 @@ class AffiliateOrganisationTypeCategoryAdmin(admin.ModelAdmin):
 
 class AffiliateAddressInline(admin.StackedInline):
     model = AffiliateAddress
+
+
+class AffiliateBankDetailInline(admin.StackedInline):
+    model = AffiliateBankDetail
 
 
 class AffiliateOrganisationInline(admin.StackedInline):
@@ -61,6 +65,7 @@ class AffiliateAdmin(admin.ModelAdmin):
     inlines = (
         AffiliateAddressInline,
         AffiliateOrganisationInline,
+        AffiliateBankDetailInline,
         AffiliatePictureTabular,
     )
 

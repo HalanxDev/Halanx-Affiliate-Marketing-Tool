@@ -16,7 +16,8 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views.decorators.http import require_http_methods
 
-from affiliates.models import Affiliate, AffiliateOccupationCategory, AffiliateOrganisationTypeCategory
+from affiliates.models import Affiliate, AffiliateOccupationCategory, AffiliateOrganisationTypeCategory, \
+    AffiliatePicture
 from affiliates.tokens import account_activation_token
 from affiliates.utils import send_account_verification_email, send_password_reset_email
 from utility.random_utils import generate_random_code
@@ -180,42 +181,57 @@ def home_page(request):
 def profile_view(request):
     affiliate = Affiliate.objects.get(user=request.user)
     metadata = {'occupation_categories': AffiliateOccupationCategory.objects.values_list('name', flat=True),
-                'organisation_type_categories': AffiliateOrganisationTypeCategory.objects.values_list('name', flat=True)}
+                'organisation_type_categories': AffiliateOrganisationTypeCategory.objects.values_list('name',
+                                                                                                      flat=True)}
 
     if request.method == 'GET':
         return render(request, 'profile.html', {'affiliate': affiliate, **metadata})
     else:
         data = request.POST
-        affiliate.user.first_name = data.get('first_name')
-        affiliate.user.last_name = data.get('last_name')
-        affiliate.user.save()
 
-        affiliate.phone_no = data.get('phone_no')
-        affiliate.occupation = AffiliateOccupationCategory.objects.filter(name=data.get('occupation')).first()
-        affiliate.save()
+        if request.FILES.get('profile_pic'):
+            AffiliatePicture.objects.create(affiliate=affiliate, image=request.FILES['profile_pic'],
+                                            is_profile_pic=True)
+            msg = "Your profile pic was updated successfully!"
+        else:
+            affiliate.user.first_name = data.get('first_name')
+            affiliate.user.last_name = data.get('last_name')
+            affiliate.user.save()
 
-        affiliate.address.street_address = data.get('street_address')
-        affiliate.address.city = data.get('city')
-        affiliate.address.pincode = data.get('pincode')
-        affiliate.address.state = data.get('state')
-        affiliate.address.country = data.get('country')
-        affiliate.address.save()
+            affiliate.phone_no = data.get('phone_no')
+            affiliate.occupation = AffiliateOccupationCategory.objects.filter(name=data.get('occupation')).first()
+            affiliate.save()
 
-        affiliate.organisation.name = data.get('organisation_name')
-        affiliate.organisation.type = AffiliateOrganisationTypeCategory.objects.filter(
-            name=data.get('organisation_type')).first()
-        affiliate.organisation.website = data.get('organisation_website')
-        affiliate.organisation.save()
+            affiliate.address.street_address = data.get('street_address')
+            affiliate.address.city = data.get('city')
+            affiliate.address.pincode = data.get('pincode')
+            affiliate.address.state = data.get('state')
+            affiliate.address.country = data.get('country')
+            affiliate.address.save()
 
-        affiliate.organisation.address.street_address = data.get('organisation_street_address')
-        affiliate.organisation.address.city = data.get('organisation_city')
-        affiliate.organisation.address.pincode = data.get('organisation_pincode')
-        affiliate.organisation.address.state = data.get('organisation_state')
-        affiliate.organisation.address.country = data.get('organisation_country')
-        affiliate.organisation.address.save()
-        affiliate.organisation.address.save()
+            affiliate.bank_detail.account_holder_name = data.get('account_holder_name')
+            affiliate.bank_detail.account_number = data.get('account_number')
+            affiliate.bank_detail.bank_name = data.get('bank_name')
+            affiliate.bank_detail.bank_branch = data.get('bank_branch')
+            affiliate.bank_detail.bank_branch_address = data.get('bank_branch_address')
+            affiliate.bank_detail.ifsc_code = data.get('ifsc_code')
+            affiliate.bank_detail.save()
 
-        msg = "Your details have been saved successfully!"
+            affiliate.organisation.name = data.get('organisation_name')
+            affiliate.organisation.type = AffiliateOrganisationTypeCategory.objects.filter(
+                name=data.get('organisation_type')).first()
+            affiliate.organisation.website = data.get('organisation_website')
+            affiliate.organisation.save()
+
+            affiliate.organisation.address.street_address = data.get('organisation_street_address')
+            affiliate.organisation.address.city = data.get('organisation_city')
+            affiliate.organisation.address.pincode = data.get('organisation_pincode')
+            affiliate.organisation.address.state = data.get('organisation_state')
+            affiliate.organisation.address.country = data.get('organisation_country')
+            affiliate.organisation.address.save()
+            affiliate.organisation.address.save()
+            msg = "Your details have been saved successfully!"
+
         return render(request, 'profile.html', {'affiliate': affiliate, 'msg': msg, **metadata})
 
 

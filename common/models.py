@@ -25,3 +25,20 @@ class AddressDetail(models.Model):
     @property
     def coordinates(self):
         return "{},{}".format(self.latitude, self.longitude)
+
+
+class BankDetail(models.Model):
+    account_holder_name = models.CharField(max_length=200, blank=True, null=True)
+    account_number = models.CharField(max_length=50, blank=True, null=True)
+    account_type = models.CharField(max_length=10, blank=True, null=True)
+    bank_name = models.CharField(max_length=200, blank=True, null=True)
+    bank_branch = models.CharField(max_length=300, blank=True, null=True)
+    bank_branch_address = models.CharField(max_length=300, blank=True, null=True)
+    ifsc_code = models.CharField(max_length=25, blank=True, null=True)
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return str(self.id)
+

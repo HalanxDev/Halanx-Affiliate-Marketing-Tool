@@ -7,24 +7,10 @@ from django.utils.html import format_html
 
 from affiliates.utils import get_affiliate_qr_code_upload_path, default_profile_pic_url, \
     default_profile_pic_thumbnail_url, get_picture_upload_path, get_thumbnail_upload_path
-from common.models import AddressDetail
+from common.models import AddressDetail, BankDetail
 from utility.image_utils import compress_image
 from utility.qrcode_utils import generate_qr_code
 from utility.random_utils import generate_random_code
-
-
-class AffiliateOccupationCategory(models.Model):
-    name = models.CharField(max_length=500, blank=True, null=True)
-
-    def __str__(self):
-        return self.name
-
-
-class AffiliateOrganisationTypeCategory(models.Model):
-    name = models.CharField(max_length=500, blank=True, null=True)
-
-    def __str__(self):
-        return self.name
 
 
 class Affiliate(models.Model):
@@ -67,6 +53,32 @@ class Affiliate(models.Model):
     get_profile_pic_html.allow_tags = True
 
 
+class AffiliateAddress(AddressDetail):
+    affiliate = models.OneToOneField('Affiliate', on_delete=models.CASCADE, related_name='address')
+
+
+class AffiliateBankDetail(BankDetail):
+    affiliate = models.OneToOneField('Affiliate', on_delete=models.CASCADE, related_name='bank_detail')
+
+
+class AffiliateOrganisationAddress(AddressDetail):
+    organisation = models.OneToOneField('AffiliateOrganisation', on_delete=models.CASCADE, related_name='address')
+
+
+class AffiliateOccupationCategory(models.Model):
+    name = models.CharField(max_length=500, blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+
+class AffiliateOrganisationTypeCategory(models.Model):
+    name = models.CharField(max_length=500, blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+
 class AffiliateOrganisation(models.Model):
     affiliate = models.OneToOneField('Affiliate', on_delete=models.CASCADE, related_name='organisation')
     type = models.ForeignKey('AffiliateOrganisationTypeCategory', blank=True, null=True, on_delete=models.SET_NULL,
@@ -103,14 +115,6 @@ class AffiliatePicture(models.Model):
         super(AffiliatePicture, self).save(*args, **kwargs)
 
 
-class AffiliateAddress(AddressDetail):
-    affiliate = models.OneToOneField('Affiliate', on_delete=models.CASCADE, related_name='address')
-
-
-class AffiliateOrganisationAddress(AddressDetail):
-    organisation = models.OneToOneField('AffiliateOrganisation', on_delete=models.CASCADE, related_name='address')
-
-
 class OTP(models.Model):
     phone_no = models.CharField(max_length=30)
     password = models.IntegerField(null=True, blank=True)
@@ -126,6 +130,7 @@ def affiliate_post_save_hook(sender, instance, created, **kwargs):
     if created:
         AffiliateOrganisation(affiliate=instance).save()
         AffiliateAddress(affiliate=instance).save()
+        AffiliateBankDetail(affiliate=instance).save()
         super(Affiliate, instance).save()
 
 
