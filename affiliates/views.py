@@ -9,6 +9,7 @@ from django.contrib.auth.forms import PasswordResetForm, PasswordChangeForm
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.views import PasswordResetView
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.paginator import Paginator
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.template import loader
@@ -282,6 +283,25 @@ def referral_upload_view(request):
                                                   house_type=house_type, source=DASHBOARD_FORM_SOURCE)
                 msg = "Referral was submitted successfully."
         return render(request, 'referral_upload.html', {'msg': msg, 'error': error, **metadata})
+
+
+@affiliate_login_required
+@require_http_methods(['GET'])
+def referral_list_view(request):
+    affiliate = Affiliate.objects.get(user=request.user)
+    referral_type = request.GET.get('type')
+    page = get_number(request.GET.get('page', 1))
+    metadata = {'referral_type': referral_type}
+
+    if referral_type == TENANT_REFERRAL:
+        referrals_list = TenantReferral.objects.filter(affiliate=affiliate)
+    elif referral_type == HOUSE_OWNER_REFERRAL:
+        referrals_list = HouseOwnerReferral.objects.filter(affiliate=affiliate)
+    else:
+        return redirect('home_page')
+    paginator = Paginator(referrals_list, 10)
+    referrals = paginator.get_page(page)
+    return render(request, 'referral_list.html', {'referrals': referrals, **metadata})
 
 
 def test_view(request):
