@@ -5,11 +5,6 @@ from sendgrid.helpers.mail import Mail
 from utility.random_utils import generate_random_code
 
 
-# noinspection PyUnusedLocal
-def get_affiliate_qr_code_upload_path(instance, filename):
-    return "qrcode/{}/{}.png".format(instance.user.id, generate_random_code(n=5))
-
-
 def get_picture_upload_path(instance, filename):
     return "affiliates/{}/pictures/{}-{}".format(instance.affiliate.id, generate_random_code(n=5),
                                                  filename.split('/')[-1])

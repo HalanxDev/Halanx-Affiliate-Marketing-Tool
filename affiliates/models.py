@@ -5,11 +5,10 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.html import format_html
 
-from affiliates.utils import get_affiliate_qr_code_upload_path, default_profile_pic_url, \
+from affiliates.utils import default_profile_pic_url, \
     default_profile_pic_thumbnail_url, get_picture_upload_path, get_thumbnail_upload_path
 from common.models import AddressDetail, BankDetail
 from utility.image_utils import compress_image
-from utility.qrcode_utils import generate_qr_code
 from utility.random_utils import generate_random_code
 
 
@@ -18,8 +17,7 @@ class Affiliate(models.Model):
     phone_no = models.CharField(max_length=15, blank=True, null=True)
     occupation = models.ForeignKey('AffiliateOccupationCategory', blank=True, null=True, on_delete=models.SET_NULL,
                                    related_name='affiliates')
-    unique_code = models.CharField(max_length=100, blank=True, null=True)
-    qr_code = models.ImageField(upload_to=get_affiliate_qr_code_upload_path, null=True, blank=True)
+    unique_code = models.CharField(max_length=100, blank=True, null=True, unique=True)
     profile_pic_url = models.CharField(max_length=500, blank=True, null=True, default=default_profile_pic_url)
     profile_pic_thumbnail_url = models.CharField(max_length=500, blank=True, null=True,
                                                  default=default_profile_pic_thumbnail_url)
@@ -37,9 +35,6 @@ class Affiliate(models.Model):
             self.unique_code = generate_random_code(initials=self.user.first_name.lower(), n=3,
                                                     existing_codes=existing_codes)
         super(Affiliate, self).save(*args, **kwargs)
-
-    def generate_qr_code(self):
-        self.qr_code.save(None, content=ContentFile(generate_qr_code("https://www.halanx.com").getvalue()))
 
     # noinspection PyUnresolvedReferences
     @property
