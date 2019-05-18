@@ -1,4 +1,5 @@
 from decouple import config
+from django.utils import timezone
 from sendgrid import sendgrid
 from sendgrid.helpers.mail import Mail
 
@@ -13,6 +14,11 @@ def get_picture_upload_path(instance, filename):
 def get_thumbnail_upload_path(instance, filename):
     return "affiliates/{}/thumbnail/{}-{}".format(instance.affiliate.id, generate_random_code(n=5),
                                                   filename.split('/')[-1])
+
+
+def get_referral_csv_upload_path(instance, filename):
+    return "affiliates/{}/referral-uploads/{}_{}".format(instance.id, timezone.now().strftime("%Y_%m_%d_%H_%M_%S"),
+                                                         filename)
 
 
 default_profile_pic_url = "https://d28fujbigzf56k.cloudfront.net/static/img/nopic.jpg"

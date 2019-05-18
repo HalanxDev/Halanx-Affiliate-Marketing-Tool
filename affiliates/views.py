@@ -1,6 +1,8 @@
 import json
 from datetime import timedelta
 
+import pandas as pd
+from io import StringIO
 from decouple import config
 from django.contrib import messages
 from django.contrib.auth import logout, authenticate, login, get_user_model, update_session_auth_hash
@@ -9,6 +11,7 @@ from django.contrib.auth.forms import PasswordResetForm, PasswordChangeForm
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.views import PasswordResetView
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.files.storage import default_storage
 from django.core.paginator import Paginator
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
@@ -23,11 +26,12 @@ from django.views.decorators.http import require_http_methods
 from affiliates.models import Affiliate, AffiliateOccupationCategory, AffiliateOrganisationTypeCategory, \
     AffiliatePicture
 from affiliates.tokens import account_activation_token
-from affiliates.utils import send_account_verification_email, send_password_reset_email
+from affiliates.utils import send_account_verification_email, send_password_reset_email, get_referral_csv_upload_path
 from referrals.models import TenantReferral, HouseOwnerReferral
-from referrals.utils import TENANT_REFERRAL, DASHBOARD_FORM_SOURCE, HOUSE_OWNER_REFERRAL
+from referrals.utils import TENANT_REFERRAL, DASHBOARD_FORM_SOURCE, HOUSE_OWNER_REFERRAL, DASHBOARD_BULK_UPLOAD_SOURCE
 from utility.form_field_utils import get_number, get_datetime
 from utility.random_utils import generate_random_code
+from utility.url_utils import build_url
 
 LOGIN_URL = '/login/'
 
@@ -256,7 +260,7 @@ def referral_upload_view(request):
 
         if referral_type == TENANT_REFERRAL:
             if TenantReferral.objects.filter(affiliate=affiliate, phone_no=phone_no,
-                                             timestamp__lte=timezone.now()-timedelta(days=30)).exists():
+                                             timestamp__gte=timezone.now() - timedelta(days=30)).exists():
                 error = "Duplicate Tenant Referral!"
             else:
                 preferred_location = data.get('preferred_location')
@@ -264,7 +268,8 @@ def referral_upload_view(request):
                 expected_movein_date = get_datetime(data.get('expected_movein_date'))
                 accomodation_for = data.get('accomodation_for')
                 accomodation_type = data.get('accomodation_type')
-                TenantReferral.objects.create(affiliate=affiliate, name=name, phone_no=phone_no, gender=gender, email=email,
+                TenantReferral.objects.create(affiliate=affiliate, name=name, phone_no=phone_no, gender=gender,
+                                              email=email,
                                               preferred_location=preferred_location, expected_rent=expected_rent,
                                               expected_movein_date=expected_movein_date,
                                               accomodation_for=accomodation_for, accomodation_type=accomodation_type,
@@ -272,7 +277,7 @@ def referral_upload_view(request):
                 msg = "Referral was submitted successfully."
         elif referral_type == HOUSE_OWNER_REFERRAL:
             if HouseOwnerReferral.objects.filter(affiliate=affiliate, phone_no=phone_no,
-                                                 timestamp__lte=timezone.now()-timedelta(days=30)).exists():
+                                                 timestamp__gte=timezone.now() - timedelta(days=30)).exists():
                 error = "Duplicate House Owner Referral!"
             else:
                 house_address = data.get('house_address')
@@ -283,6 +288,61 @@ def referral_upload_view(request):
                                                   house_type=house_type, source=DASHBOARD_FORM_SOURCE)
                 msg = "Referral was submitted successfully."
         return render(request, 'referral_upload.html', {'msg': msg, 'error': error, **metadata})
+
+
+@affiliate_login_required
+@require_http_methods(['POST'])
+def referral_upload_csv_view(request):
+    affiliate = Affiliate.objects.get(user=request.user)
+    referral_type = request.POST.get('referral_type')
+
+    try:
+        csv_file = request.FILES['csv_file']
+        if not csv_file.name.endswith('.csv'):
+            messages.error(request, "File is not CSV type")
+            return HttpResponseRedirect(reverse('referral_upload_view'))
+
+        # if file is too large, return
+        if csv_file.multiple_chunks():
+            messages.error(request, "Uploaded file is too big ({:.2f} MB).".format(csv_file.size / (1000 * 1000), ))
+            return HttpResponseRedirect(reverse('referral_upload_view'))
+
+        df = pd.read_csv(StringIO(csv_file.read().decode('utf-8')))
+        default_storage.save(get_referral_csv_upload_path(affiliate, csv_file.name), csv_file)
+
+        if 'Name' in df.columns and 'Phone Number' in df.columns:
+            count = 0
+            for row in df.to_dict('records'):
+                if referral_type == TENANT_REFERRAL:
+                    if not TenantReferral.objects.filter(affiliate=affiliate, phone_no=row['Phone Number'],
+                                                         timestamp__gte=timezone.now() - timedelta(days=30)).exists():
+                        TenantReferral.objects.create(affiliate=affiliate, phone_no=row['Phone Number'],
+                                                      email=row.get('Email'), name=row['Name'],
+                                                      gender=row.get('Gender'),
+                                                      preferred_location=row.get('Preferred Location'),
+                                                      expected_movein_date=get_datetime(row.get('Expected Move-In Date')),
+                                                      accomodation_for=row.get('Accomodation For'),
+                                                      accomodation_type=row.get('Accomodation Type'),
+                                                      source=DASHBOARD_BULK_UPLOAD_SOURCE)
+                        count += 1
+                elif referral_type == HOUSE_OWNER_REFERRAL:
+                    if not HouseOwnerReferral.objects.filter(affiliate=affiliate, phone_no=row['Phone Number'],
+                                                             timestamp__gte=timezone.now() - timedelta(days=30)
+                                                             ).exists():
+                        HouseOwnerReferral.objects.create(affiliate=affiliate, phone_no=row['Phone Number'],
+                                                          email=row.get('Email'), name=row['Name'],
+                                                          gender=row.get('Gender'),
+                                                          house_address=row.get('House Address'),
+                                                          bhk_count=row.get('BHK Count'),
+                                                          house_type=row.get('House Type'),
+                                                          source=DASHBOARD_BULK_UPLOAD_SOURCE)
+                        count += 1
+            messages.info(request, "{} referrals were submitted successfully!".format(count))
+        else:
+            messages.error(request, "File does not contain required headers `Name` and `Phone Number`.")
+    except Exception as e:
+        messages.error(request, "Unable to upload file. " + repr(e))
+    return HttpResponseRedirect(build_url('referral_upload_view', params={'type': referral_type}))
 
 
 @affiliate_login_required

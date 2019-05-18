@@ -42,7 +42,7 @@
             let css_link = $("<link>", {
                 rel: "stylesheet",
                 type: "text/css",
-                href: "http://127.0.0.1:8000/static/css/widgets/style.css"
+                href: "http://127.0.0.1:8000/static/widgets/css/style.css"
             });
             css_link.appendTo('head');
 

@@ -6,26 +6,36 @@
 
 
 {% block content %}
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
     <div class="row">
         <div class="col-lg-6 col-sm-12">
             <div class="card">
                 <div class="card-header">
-                    <h4>{% if referral_type == 'tenant' %}Tenant{% elif referral_type == 'house_owner' %}House Owner{% endif %} Referral Form</h4>
+                    <h4>{% if referral_type == 'tenant' %}Tenant{% elif referral_type == 'house_owner' %}House
+                        Owner{% endif %} Referral Form</h4>
                 </div>
 
                 <div class="card-body">
-                    <form class="form-horizontal" id="tenant_referral_form" method="post">
+                    <form class="form-horizontal" id="referral_upload_form" method="post">
                         {% csrf_token %}
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-sm-6">
                                     <label>Name *</label>
-                                    <input type="text" name="name" class="form-control" placeholder="Enter Name" required>
+                                    <input type="text" name="name" class="form-control" placeholder="Enter Name"
+                                           required>
                                 </div>
 
                                 <div class="col-sm-6">
                                     <label>Phone Number *</label>
-                                    <input type="text" name="phone_no" class="form-control" placeholder="Enter 10 digit Phone Number"
+                                    <input type="text" name="phone_no" class="form-control"
+                                           placeholder="Enter 10 digit Phone Number"
                                            required>
                                 </div>
                             </div>
@@ -53,84 +63,87 @@
                         </div>
 
                         {% if referral_type == 'tenant' %}
-                        <div class="form-group" style="margin-top: 0;">
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <label>Preferred Location for Rent</label>
-                                    <input type="text" class="form-control" name="preferred_location" id="select_location"
-                                           placeholder="Search Location">
+                            <div class="form-group" style="margin-top: 0;">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <label>Preferred Location for Rent</label>
+                                        <input type="text" class="form-control" name="preferred_location"
+                                               id="select_location"
+                                               placeholder="Search Location">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="form-group">
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <label>Expected Rent</label>
-                                    <input type="text" class="form-control" name="expected_rent" placeholder="Enter Expected Rent (in ₹)">
-                                </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label>Expected Rent</label>
+                                        <input type="text" class="form-control" name="expected_rent"
+                                               placeholder="Enter Expected Rent (in ₹)">
+                                    </div>
 
-                                <div class="col-sm-6">
-                                    <label>Expected Move-In Date</label>
-                                    <input type="date" class="form-control" name="expected_movein_date">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <label>Accomodation For</label>
-                                    <select class="form-control" name="accomodation_for">
-                                        <option disabled selected>Select Accomodation For</option>
-                                        {% with 'Boys Girls Family' as opts %}
-                                            {% for opt in opts.split %}
-                                                <option value="{{ opt.lower }}">{{ opt }}</option>
-                                            {% endfor %}
-                                        {% endwith %}
-                                    </select>
-                                </div>
-
-                                <div class="col-sm-6">
-                                    <label>Accomodation Type</label>
-                                    <select class="form-control" name="accomodation_type">
-                                        <option disabled selected>Select Accomodation Type</option>
-                                        <option value="shared">Shared Room</option>
-                                        <option value="private">Private Room</option>
-                                        <option value="flat">Entire House</option>
-                                    </select>
+                                    <div class="col-sm-6">
+                                        <label>Expected Move-In Date</label>
+                                        <input type="date" class="form-control" name="expected_movein_date">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label>Accomodation For</label>
+                                        <select class="form-control" name="accomodation_for">
+                                            <option disabled selected>Select Accomodation For</option>
+                                            {% with 'Boys Girls Family' as opts %}
+                                                {% for opt in opts.split %}
+                                                    <option value="{{ opt.lower }}">{{ opt }}</option>
+                                                {% endfor %}
+                                            {% endwith %}
+                                        </select>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <label>Accomodation Type</label>
+                                        <select class="form-control" name="accomodation_type">
+                                            <option disabled selected>Select Accomodation Type</option>
+                                            <option value="shared">Shared Room</option>
+                                            <option value="private">Private Room</option>
+                                            <option value="flat">Entire House</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
                         {% elif referral_type == 'house_owner' %}
-                        <div class="form-group" style="margin-top: 0;">
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <label>House Address *</label>
-                                    <input type="text" class="form-control" name="house_address" id="select_location"
-                                           placeholder="Enter House Address" required>
+                            <div class="form-group" style="margin-top: 0;">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <label>House Address *</label>
+                                        <input type="text" class="form-control" name="house_address"
+                                               id="select_location"
+                                               placeholder="Enter House Address" required>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="form-group">
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <label>House Type</label>
-                                    <select class="form-control" name="house_type">
-                                        <option disabled selected>Select House Type</option>
-                                        <option value="independent">Independent</option>
-                                        <option value="apartment">Apartment</option>
-                                        <option value="villa">Villa</option>
-                                    </select>
-                                </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label>House Type</label>
+                                        <select class="form-control" name="house_type">
+                                            <option disabled selected>Select House Type</option>
+                                            <option value="independent">Independent</option>
+                                            <option value="apartment">Apartment</option>
+                                            <option value="villa">Villa</option>
+                                        </select>
+                                    </div>
 
-                                <div class="col-sm-6">
-                                    <label>BHK Count</label>
-                                    <input type="number" class="form-control" name="bhk_count" value="2">
+                                    <div class="col-sm-6">
+                                        <label>BHK Count</label>
+                                        <input type="number" class="form-control" name="bhk_count" value="2">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                         {% endif %}
                     </form>
                 </div>
@@ -138,7 +151,7 @@
                 <div class="card-footer">
                     <div class="row">
                         <div class="col-sm-3">
-                            <button type="submit" form="tenant_referral_form" class="btn btn-primary btn-block">Submit
+                            <button type="submit" form="referral_upload_form" class="btn btn-primary btn-block">Submit
                             </button>
                         </div>
                     </div>
@@ -149,7 +162,39 @@
         <div class="col-lg-6 col-sm-12">
             <div class="card">
                 <div class="card-header">
-                    <h4>{% if referral_type == 'tenant' %}Tenant{% elif referral_type == 'house_owner' %}House Owner{% endif %} Referral Bulk Upload</h4>
+                    <h4>{% if referral_type == 'tenant' %}Tenant{% elif referral_type == 'house_owner' %}House
+                        Owner{% endif %} Referral Bulk Upload</h4>
+                </div>
+
+                <div class="card-body">
+                    <form class="form-horizontal" id="referral_upload_csv" method="post" action="{{ referral_upload_csv_url }}"
+                          enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="referral_type" value="{{ referral_type }}">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-sm-1">
+                                    <label for="name" class="col-form-label">File:</label>
+                                </div>
+                                <div class="col-sm-11">
+                                    <input type="file" class="form-control" name="csv_file" id="csv_file" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-sm-1">
+
+                                </div>
+                                <div class="col-sm-11" style="margin-bottom:10px;">
+                                    <button class="btn btn-primary">
+                                        <span class="fa fa-upload" style="margin-right:5px;"></span>Upload
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
