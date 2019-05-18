@@ -320,7 +320,9 @@ def referral_upload_csv_view(request):
                                                       email=row.get('Email'), name=row['Name'],
                                                       gender=row.get('Gender'),
                                                       preferred_location=row.get('Preferred Location'),
-                                                      expected_movein_date=get_datetime(row.get('Expected Move-In Date')),
+                                                      expected_rent=row.get('Expected Rent'),
+                                                      expected_movein_date=get_datetime(
+                                                          row.get('Expected Move-In Date')),
                                                       accomodation_for=row.get('Accomodation For'),
                                                       accomodation_type=row.get('Accomodation Type'),
                                                       source=DASHBOARD_BULK_UPLOAD_SOURCE)

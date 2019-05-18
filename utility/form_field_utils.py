@@ -16,7 +16,7 @@ def get_number(field_str):
 def get_datetime(raw_date):
     if raw_date in [None, '']:
         return None
-    for fmt in ('%Y-%m-%d', '%Y-%m-%d %H:%M:%S'):
+    for fmt in ('%Y-%m-%d', '%Y-%m-%d %H:%M:%S', '%d-%m-%Y'):
         try:
             return timezone.make_aware(datetime.strptime(raw_date, fmt), timezone.get_default_timezone())
         except ValueError:

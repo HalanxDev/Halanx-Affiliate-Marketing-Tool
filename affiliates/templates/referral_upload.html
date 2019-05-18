@@ -1,4 +1,5 @@
 {% extends 'base/base.html' %}
+{% load static %}
 
 {% block title %}
     Upload Referral
@@ -187,9 +188,15 @@
                                 <div class="col-sm-1">
 
                                 </div>
-                                <div class="col-sm-11" style="margin-bottom:10px;">
+                                <div class="col-sm-6" style="margin-bottom:10px;">
                                     <button class="btn btn-primary">
                                         <span class="fa fa-upload" style="margin-right:5px;"></span>Upload
+                                    </button>
+                                </div>
+                                 <div class="col-sm-5 text-right" style="margin-bottom:10px;">
+                                    <button class="btn btn-default"
+                                            onclick="window.open('{% get_static_prefix %}/misc/{{ referral_type }}_referral_bulk_upload_sample.csv')">
+                                        <span class="fa fa-download" style="margin-right:5px;"></span>Download Sample
                                     </button>
                                 </div>
                             </div>
