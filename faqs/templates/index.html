@@ -1,0 +1,129 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+FAQs
+{% endblock %}
+
+{% block style %}
+<style>
+.faq-nav {
+  flex-direction: column;
+  margin: 0 0 32px;
+  border-radius: 2px;
+  border: 1px solid #ddd;
+  box-shadow: 0 1px 5px rgba(85, 85, 85, 0.15);
+}
+.faq-nav .nav-link {
+  position: relative;
+  display: block;
+  margin: 0;
+  padding: 13px 16px;
+  background-color: #fff;
+  border: 0;
+  border-bottom: 1px solid #ddd;
+  border-radius: 0;
+  color: #616161;
+  transition: background-color 0.2s ease;
+}
+.faq-nav .nav-link:hover {
+  background-color: #f6f6f6;
+}
+.faq-nav .nav-link.active {
+  background-color: #f6f6f6;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.87);
+}
+.faq-nav .nav-link:last-of-type {
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+  border-bottom: 0;
+}
+.faq-nav .nav-link i.mdi {
+  margin-right: 5px;
+  font-size: 18px;
+  position: relative;
+}
+.tab-content {
+  box-shadow: 0 1px 5px rgba(85, 85, 85, 0.15);
+}
+.tab-content .card {
+  border-radius: 0;
+}
+.tab-content .card-header {
+  padding: 15px 16px;
+  border-radius: 0;
+  background-color: #f6f6f6;
+}
+.tab-content .card-header h5 {
+  margin: 0;
+}
+.tab-content .card-header h5 button {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.87);
+  text-align: left;
+  white-space: normal;
+}
+.tab-content .card-header h5 button:hover, .tab-content .card-header h5 button:focus, .tab-content .card-header h5 button:active, .tab-content .card-header h5 button:hover:active {
+  text-decoration: none;
+}
+.tab-content .card-body p {
+  color: #616161;
+}
+.tab-content .card-body p:last-of-type {
+  margin: 0;
+}
+.accordion > .card:not(:first-child) {
+  border-top: 0;
+}
+.collapse.show .card-body {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="nav nav-pills faq-nav" id="faq-tabs" role="tablist" aria-orientation="vertical">
+                {% for topic in topics %}
+                    <a href="#tab{{ forloop.counter }}" class="nav-link {% if forloop.counter == 1 %}active{% endif %}" data-toggle="pill" role="tab"
+                       aria-controls="tab{{ forloop.counter }}" aria-selected="false">
+                        <i class="mdi mdi-help"></i> {{ topic.name }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="tab-content" id="faq-tab-content">
+                {% for topic in topics %}
+                <div class="tab-pane {% if forloop.counter == 1 %}show active{% endif %}" id="tab{{ forloop.counter }}" role="tabpanel" aria-labelledby="tab{{ forloop.counter }}">
+                    <div class="accordion" id="accordion-tab-{{ forloop.counter }}">
+                        {% for question in topic.questions.all %}
+                        <div class="card">
+                            <div class="card-header" id="accordion-tab-{{ forloop.parentloop.counter }}-heading-{{ forloop.counter }}">
+                                <h5>
+                                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#accordion-tab-{{ forloop.parentloop.counter }}-content-{{ forloop.counter }}" aria-expanded="false" aria-controls="accordion-tab-{{ forloop.parentloop.counter }}-content-{{ forloop.counter }}">{{ question.text }}</button>
+                                </h5>
+                            </div>
+                            <div class="collapse {% if forloop.counter == 1 %}show{% endif %}" id="accordion-tab-{{ forloop.parentloop.counter }}-content-{{ forloop.counter }}" aria-labelledby="accordion-tab-{{ forloop.parentloop.counter }}-heading-{{ forloop.counter }}" data-parent="#accordion-tab-1">
+                                <div class="card-body">
+                                    <p>{{ question.answer|linebreaks }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

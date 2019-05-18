@@ -8,6 +8,7 @@ from utility.environments import DEVELOPMENT
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    url(r'^faqs/', include('faqs.urls')),
     url(r'', include('affiliates.urls')),
 ]
 

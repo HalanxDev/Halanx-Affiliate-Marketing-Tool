@@ -15,7 +15,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'affiliates',
-    'referrals'
+    'referrals',
+    'faqs',
 ]
 
 MIDDLEWARE = [
