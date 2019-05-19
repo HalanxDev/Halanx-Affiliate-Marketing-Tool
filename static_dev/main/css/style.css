@@ -13,3 +13,19 @@
     margin-bottom: 0;
     text-align: right
 }
+
+#ajaxLoad {
+    display : none;
+}
+
+#ajaxLoad.show {
+    display : block;
+    position : fixed;
+    z-index: 100;
+    opacity : 0.4;
+    background: #666 url('http://loadinggif.com/images/image-selection/3.gif') no-repeat center;
+    left : 0;
+    bottom : 0;
+    right : 0;
+    top : 0;
+}

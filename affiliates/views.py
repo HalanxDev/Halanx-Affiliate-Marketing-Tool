@@ -73,6 +73,8 @@ def login_view(request):
                         return HttpResponseRedirect(next_page)
                     else:
                         return HttpResponseRedirect(reverse(home_page))
+                else:
+                    error_msg = 'You need to activate your account by verifying your email ID.'
             else:
                 error_msg = 'You are not an Affiliate.'
         else:
@@ -104,7 +106,7 @@ def register_view(request):
         # create user
         try:
             user = User.objects.create(username=username, first_name=first_name, last_name=last_name,
-                                       email=email)
+                                       email=email, is_active=False)
             user.set_password(password)
             user.save()
         except Exception as e:

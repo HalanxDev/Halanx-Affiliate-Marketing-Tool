@@ -97,3 +97,8 @@ class AffiliateAdmin(admin.ModelAdmin):
 @admin.register(AffiliatePayment)
 class AffiliatePaymentAdmin(admin.ModelAdmin):
     list_display = ('id', 'wallet', 'amount', 'status', 'due_date', 'paid_on')
+
+
+@admin.register(AffiliateWallet)
+class AffiliateWalletAdmin(admin.ModelAdmin):
+    pass
