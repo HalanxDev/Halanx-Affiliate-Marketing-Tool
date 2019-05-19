@@ -7,7 +7,7 @@ from django.utils.html import format_html
 
 from affiliates.utils import default_profile_pic_url, \
     default_profile_pic_thumbnail_url, get_picture_upload_path, get_thumbnail_upload_path, \
-    DEFAULT_TENANT_CONVERSION_COMMISSION, DEFAULT_HOUSE_OWNER_CONVERSION_COMMISSION
+    DEFAULT_TENANT_CONVERSION_COMMISSION, DEFAULT_HOUSE_OWNER_CONVERSION_COMMISSION, update_monthly_report_start_balance
 from common.models import AddressDetail, BankDetail, Wallet
 from common.utils import PENDING, PaymentStatusCategories, PAID
 from referrals.utils import SUCCESS
@@ -142,6 +142,10 @@ class AffiliateMonthlyReport(models.Model):
     def __str__(self):
         return str(self.id)
 
+    def get_payments(self):
+        return self.affiliate.wallet.payments.filter(status=PAID, paid_on__gte=self.start_date,
+                                                     paid_on__lte=self.end_date)
+
     def save(self, *args, **kwargs):
         if not self.pk:
             self.tenant_conversion_commission = self.affiliate.tenant_conversion_commission
@@ -157,7 +161,7 @@ class AffiliateMonthlyReport(models.Model):
                                                                                         self.end_date).count()
         self.earning = (self.affiliate.tenant_conversion_commission * self.tenant_conversion_count +
                         self.affiliate.house_owner_conversion_commission * self.house_owner_conversion_count)
-        self.end_balance = self.start_balance + self.earning
+        self.end_balance = self.start_balance + self.earning - sum(self.get_payments().values_list('amount', flat=True))
         super(AffiliateMonthlyReport, self).save(*args, **kwargs)
 
 
@@ -239,3 +243,5 @@ def affiliate_payment_post_save_hook(sender, instance, created, **kwargs):
     wallet.debit = sum(payment.amount for payment in wallet.payments.filter(status=PAID))
     wallet.pending_withdrawal = sum(payment.amount for payment in wallet.payments.filter(status=PENDING))
     wallet.save()
+    update_monthly_report_start_balance(instance.wallet.affiliate)
+

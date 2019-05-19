@@ -26,7 +26,8 @@ from django.views.decorators.http import require_http_methods
 from affiliates.models import Affiliate, AffiliateOccupationCategory, AffiliateOrganisationTypeCategory, \
     AffiliatePicture
 from affiliates.tokens import account_activation_token
-from affiliates.utils import send_account_verification_email, send_password_reset_email, get_referral_csv_upload_path
+from affiliates.utils import send_account_verification_email, send_password_reset_email, get_referral_csv_upload_path, \
+    get_or_create_monthly_report
 from referrals.models import TenantReferral, HouseOwnerReferral
 from referrals.utils import TENANT_REFERRAL, DASHBOARD_FORM_SOURCE, HOUSE_OWNER_REFERRAL, DASHBOARD_BULK_UPLOAD_SOURCE
 from utility.form_field_utils import get_number, get_datetime
@@ -364,6 +365,16 @@ def referral_list_view(request):
     paginator = Paginator(referrals_list, 10)
     referrals = paginator.get_page(page)
     return render(request, 'referral_list.html', {'referrals': referrals, **metadata})
+
+
+@affiliate_login_required
+@require_http_methods(['GET'])
+def earnings_view(request):
+    affiliate = Affiliate.objects.get(user=request.user)
+    get_or_create_monthly_report(affiliate=affiliate, month=timezone.now().month, year=timezone.now().year)
+    monthly_reports = affiliate.monthly_reports.all().order_by('-start_date')
+    return render(request, 'earnings.html', {'affiliate': affiliate,
+                                             'monthly_reports': monthly_reports})
 
 
 def test_view(request):

@@ -1,0 +1,68 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+    My Earnings
+{% endblock %}
+
+
+{% block content %}
+    <div class="accordion" id="accordion">
+        {% for report in monthly_reports %}
+        <div class="card">
+            <div class="card-header" id="heading{{ forloop.counter }}">
+                <h5 class="mb-0">
+                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}"
+                            aria-expanded="{% if forloop.counter == 1 %}true{% else %}false{% endif %}" aria-controls="collapse{{ forloop.counter }}">
+                        {{ report.start_date|date:"b, Y"|title }}
+                    </button>
+                </h5>
+            </div>
+
+            <div id="collapse{{ forloop.counter }}" class="collapse {% if forloop.counter == 1 %}show{% endif %}" aria-labelledby="heading{{ forloop.counter }}" data-parent="#accordion">
+                <div class="card-header text-right">
+                    <b>Ending Balance:</b> ₹{{ report.end_balance }}
+                </div>
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h4>Tenant Referral Conversions: {{ report.tenant_conversion_count }}</h4>
+                        </div>
+                        <div class="col-sm-6">
+                            <h4>House Owner Referral Conversions: {{ report.house_owner_conversion_count }}</h4>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Amount (in ₹)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1-{{ report.end_date|date:"d b, Y"|title }}</td>
+                                    <td>Referral Conversion Earnings</td>
+                                    <td>{{ report.earning }}</td>
+                                </tr>
+                                {% for payment in report.get_payments %}
+                                <tr>
+                                    <td>{{ payment.paid_on|date:"d b, Y"|title }}</td>
+                                    <td>Payment</td>
+                                    <td>{{ payment.amount }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer text-right">
+                    <b>Starting Balance:</b> ₹{{ report.start_balance }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}

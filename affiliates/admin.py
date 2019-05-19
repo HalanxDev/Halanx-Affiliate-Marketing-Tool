@@ -4,7 +4,7 @@ from django.utils.safestring import mark_safe
 
 from affiliates.models import Affiliate, AffiliateAddress, AffiliateOrganisation, AffiliateOrganisationAddress, \
     AffiliateOccupationCategory, AffiliateOrganisationTypeCategory, AffiliatePicture, AffiliateBankDetail, \
-    AffiliateWallet, AffiliateMonthlyReport
+    AffiliateWallet, AffiliateMonthlyReport, AffiliatePayment
 
 
 @admin.register(AffiliateOccupationCategory)
@@ -92,3 +92,8 @@ class AffiliateAdmin(admin.ModelAdmin):
     @staticmethod
     def organisation_name(obj):
         return obj.organisation.name
+
+
+@admin.register(AffiliatePayment)
+class AffiliatePaymentAdmin(admin.ModelAdmin):
+    list_display = ('id', 'wallet', 'amount', 'status', 'due_date', 'paid_on')

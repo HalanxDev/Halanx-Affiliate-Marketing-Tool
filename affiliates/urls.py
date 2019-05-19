@@ -20,6 +20,7 @@ urlpatterns = [
     url(r'^reset/done/$', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 
     url(r'^profile/$', views.profile_view, name='profile_view'),
+    url(r'^earnings/$', views.earnings_view, name='earnings_view'),
 
     url(r'^referrals/upload/$', views.referral_upload_view, name='referral_upload_view'),
     url(r'^referrals/upload/csv/$', views.referral_upload_csv_view, name='referral_upload_csv_view'),
