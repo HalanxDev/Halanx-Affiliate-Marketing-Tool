@@ -10,6 +10,7 @@ from affiliates.utils import default_profile_pic_url, \
     DEFAULT_TENANT_CONVERSION_COMMISSION, DEFAULT_HOUSE_OWNER_CONVERSION_COMMISSION
 from common.models import AddressDetail, BankDetail, Wallet
 from common.utils import PENDING, PaymentStatusCategories, PAID
+from referrals.utils import SUCCESS
 from utility.image_utils import compress_image
 from utility.random_utils import generate_random_code
 
@@ -129,19 +130,34 @@ class AffiliateMonthlyReport(models.Model):
     earning = models.FloatField(default=0)
     tenant_conversion_count = models.IntegerField(default=0)
     house_owner_conversion_count = models.IntegerField(default=0)
+    tenant_conversion_commission = models.FloatField(default=DEFAULT_TENANT_CONVERSION_COMMISSION)
+    house_owner_conversion_commission = models.FloatField(default=DEFAULT_HOUSE_OWNER_CONVERSION_COMMISSION)
 
     start_balance = models.FloatField(default=0)
     end_balance = models.FloatField(default=0)
 
     class Meta:
-        ordering = ('start_date', )
+        ordering = ('start_date',)
 
     def __str__(self):
         return str(self.id)
 
     def save(self, *args, **kwargs):
+        if not self.pk:
+            self.tenant_conversion_commission = self.affiliate.tenant_conversion_commission
+            self.house_owner_conversion_commission = self.affiliate.house_owner_conversion_commission
+
+        self.tenant_conversion_count = self.affiliate.tenant_referrals.filter(status=SUCCESS,
+                                                                              converted_at__gte=self.start_date,
+                                                                              converted_at__lte=self.end_date).count()
+        self.house_owner_conversion_count = self.affiliate.house_owner_referrals.filter(status=SUCCESS,
+                                                                                        converted_at__gte=
+                                                                                        self.start_date,
+                                                                                        converted_at__lte=
+                                                                                        self.end_date).count()
         self.earning = (self.affiliate.tenant_conversion_commission * self.tenant_conversion_count +
                         self.affiliate.house_owner_conversion_commission * self.house_owner_conversion_count)
+        self.end_balance = self.start_balance + self.earning
         super(AffiliateMonthlyReport, self).save(*args, **kwargs)
 
 
@@ -210,7 +226,7 @@ def affiliate_picture_post_save_task(sender, instance, *args, **kwargs):
 
 # noinspection PyUnusedLocal
 @receiver(post_save, sender=AffiliateMonthlyReport)
-def affiliate_payment_post_save_hook(sender, instance, created, **kwargs):
+def affiliate_monthly_report_post_save_hook(sender, instance, created, **kwargs):
     wallet = instance.affiliate.wallet
     wallet.credit = sum(monthly_report.earning for monthly_report in instance.affiliate.monthly_reports.all())
     wallet.save()

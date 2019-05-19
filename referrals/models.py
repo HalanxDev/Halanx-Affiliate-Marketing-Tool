@@ -2,7 +2,7 @@ from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
 from django.db import models
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from django.utils import timezone
 
@@ -49,17 +49,23 @@ class HouseOwnerReferral(Referral):
     bhk_count = models.PositiveIntegerField(default=1, blank=True, null=True)
 
 
-def update_monthly_report_balance(affiliate):
+def update_monthly_report_start_balance(affiliate):
     monthly_reports = list(AffiliateMonthlyReport.objects.filter(affiliate=affiliate))
-
     for idx, monthly_report in enumerate(monthly_reports):
         if idx == 0:
             monthly_report.start_balance = 0
-            monthly_report.end_balance = monthly_report.earning
         else:
             monthly_report.start_balance = monthly_reports[idx - 1].end_balance
-            monthly_report.end_balance = monthly_report.start_balance + monthly_report.earning
         monthly_report.save()
+
+
+def get_or_create_monthly_report(affiliate, month, year):
+    start_date = datetime(year, month, 1)
+    end_date = start_date + relativedelta(months=+1, seconds=-1)
+
+    monthly_report, _ = AffiliateMonthlyReport.objects.get_or_create(affiliate=affiliate, start_date=start_date,
+                                                                     end_date=end_date)
+    return monthly_report
 
 
 # noinspection PyUnusedLocal
@@ -69,30 +75,8 @@ def tenant_referral_pre_save_hook(sender, instance, **kwargs):
     if not old_tenant_referral:
         return
 
-    if old_tenant_referral.status == PENDING and instance.status == SUCCESS:
-        if instance.affiliate:
-            affiliate = instance.affiliate
-
-            month = instance.converted_at.month
-            year = instance.converted_at.year
-            start_date = timezone.make_aware(datetime(year, month, 1))
-            end_date = start_date + relativedelta(months=+1, seconds=-1)
-
-            current_monthly_report, _ = AffiliateMonthlyReport.objects.get_or_create(affiliate=affiliate,
-                                                                                     start_date=start_date,
-                                                                                     end_date=end_date)
-
-            current_monthly_report.tenant_conversion_count = (TenantReferral
-                                                              .objects.filter(affiliate=affiliate, status=SUCCESS,
-                                                                              converted_at__gte=
-                                                                              current_monthly_report.start_date,
-                                                                              converted_at__lte=
-                                                                              current_monthly_report.end_date).count()
-                                                              + 1)
-
-            current_monthly_report.save()
-
-            update_monthly_report_balance(affiliate)
+    if instance.affiliate and old_tenant_referral.status != instance.status and instance.converted_at:
+        get_or_create_monthly_report(instance.affiliate, instance.converted_at.month, instance.converted_at.year)
 
 
 # noinspection PyUnusedLocal
@@ -102,27 +86,19 @@ def house_owner_referral_pre_save_hook(sender, instance, **kwargs):
     if not old_house_owner_referral:
         return
 
-    if old_house_owner_referral.status == PENDING and instance.status == SUCCESS:
-        if instance.affiliate:
-            affiliate = instance.affiliate
+    if instance.affiliate and old_house_owner_referral.status != instance.status and instance.converted_at:
+        get_or_create_monthly_report(instance.affiliate, instance.converted_at.month, instance.converted_at.year)
 
-            month = instance.converted_at.month
-            year = instance.converted_at.year
-            start_date = datetime(year, month, 1)
-            end_date = start_date + relativedelta(months=+1, seconds=-1)
 
-            current_monthly_report, _ = AffiliateMonthlyReport.objects.get_or_create(affiliate=affiliate,
-                                                                                     start_date=start_date,
-                                                                                     end_date=end_date)
+# noinspection PyUnusedLocal
+@receiver(post_save, sender=TenantReferral)
+def tenant_referral_post_save_hook(sender, instance, created, **kwargs):
+    if instance.affiliate:
+        update_monthly_report_start_balance(instance.affiliate)
 
-            current_monthly_report.tenant_conversion_count = (HouseOwnerReferral
-                                                              .objects.filter(affiliate=affiliate, status=SUCCESS,
-                                                                              converted_at__gte=
-                                                                              current_monthly_report.start_date,
-                                                                              converted_at__lte=
-                                                                              current_monthly_report.end_date).count()
-                                                              + 1)
 
-            current_monthly_report.save()
-
-            update_monthly_report_balance(affiliate)
+# noinspection PyUnusedLocal
+@receiver(post_save, sender=HouseOwnerReferral)
+def house_owner_referral_post_save_hook(sender, instance, created, **kwargs):
+    if instance.affiliate:
+        update_monthly_report_start_balance(instance.affiliate)
