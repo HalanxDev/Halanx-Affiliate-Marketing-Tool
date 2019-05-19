@@ -55,7 +55,7 @@ def logout_view(request):
     logout(request)
     request.session.flush()
     request.user = AnonymousUser
-    return HttpResponseRedirect(reverse(home_page))
+    return HttpResponseRedirect(reverse(dashboard_view))
 
 
 def login_view(request):
@@ -180,7 +180,15 @@ class CustomPasswordResetView(PasswordResetView):
 
 @require_http_methods(['GET'])
 def home_page(request):
+    if request.user.is_authenticated and is_affiliate(request.user):
+        return redirect('dashboard')
     return render(request, 'home.html')
+
+
+@affiliate_login_required
+@require_http_methods(['GET'])
+def dashboard_view(request):
+    return render(request, 'dashboard.html')
 
 
 @affiliate_login_required

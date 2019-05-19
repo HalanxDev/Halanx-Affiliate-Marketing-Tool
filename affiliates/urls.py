@@ -19,12 +19,13 @@ urlpatterns = [
         auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     url(r'^reset/done/$', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 
-    url(r'^profile/$', views.profile_view, name='profile_view'),
-    url(r'^earnings/$', views.earnings_view, name='earnings_view'),
+    url(r'^dashboard/$', views.dashboard_view, name='dashboard'),
+    url(r'^profile/$', views.profile_view, name='profile'),
+    url(r'^earnings/$', views.earnings_view, name='earnings'),
 
-    url(r'^referrals/upload/$', views.referral_upload_view, name='referral_upload_view'),
-    url(r'^referrals/upload/csv/$', views.referral_upload_csv_view, name='referral_upload_csv_view'),
-    url(r'^referrals/list/$', views.referral_list_view, name='referral_list_view'),
+    url(r'^referrals/upload/$', views.referral_upload_view, name='referral_upload'),
+    url(r'^referrals/upload/csv/$', views.referral_upload_csv_view, name='referral_upload_csv'),
+    url(r'^referrals/list/$', views.referral_list_view, name='referral_list'),
 
     url(r'^widgets/data.js', views.test_view),
 ]

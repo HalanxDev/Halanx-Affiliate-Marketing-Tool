@@ -3,12 +3,13 @@
     <nav class="sidebar-nav">
         <ul class="nav">
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'home_page' %}">
+                <a class="nav-link" href="{% url 'dashboard' %}">
                     <i class="icon-speedometer"></i>
                     Dashboard
                 </a>
             </li>
 
+            {% if request.user.is_authenticated %}
             <li class="nav-item nav-dropdown">
                 <a class="nav-link nav-dropdown-toggle" href="#">
                     <i class="nav-icon fa fa-upload"></i> Upload Referrals
@@ -50,11 +51,12 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'earnings_view' %}">
+                <a class="nav-link" href="{% url 'earnings' %}">
                     <i class="fa fa-money"></i>
                     My Earnings
                 </a>
             </li>
+            {% endif %}
 
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'faqs' %}">

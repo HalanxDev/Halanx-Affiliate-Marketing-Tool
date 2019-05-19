@@ -34,7 +34,7 @@ Login
             </div>
 
             {% if error %}
-                <p class="label label-danger">
+                <p class="alert alert-danger">
                     {{ error}}
                 </p>
             {% endif %}
@@ -42,6 +42,9 @@ Login
             <div class="form-group">
                 <div class="row">
                     <div class="col-sm-12 text-right">
+                        <a href="{{ register_url }}">
+                            <span class="badge badge-info">Create New Account</span>
+                        </a>
                         <a href="{{ password_reset_url }}">
                             <span class="badge badge-dark">Forgot Password?</span>
                         </a>

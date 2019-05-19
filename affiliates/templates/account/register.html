@@ -55,7 +55,7 @@ Register
 
             <div class="form-group">
                 <div class="col-sm-offset-3">
-                    <p id="registration_error" class="label label-danger"></p>
+                    <p id="registration_error" class="alert alert-danger" style="display: none;"></p>
                 </div>
             </div>
 
@@ -112,6 +112,7 @@ Register
                 },
                 error: function( jqXhr, textStatus, errorThrown ){
                     $('#registration_error').html(jqXhr.responseJSON['error']);
+                    $('#registration_error').show();
                 }
             });
         }
