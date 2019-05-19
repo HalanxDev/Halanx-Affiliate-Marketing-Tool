@@ -34,8 +34,11 @@
                             <input type="file" id="profile_pic_input" name="profile_pic"/>
                         </form>
                     </div>
-                    <button type="button" class="btn btn-primary btn-sm" onclick="chooseFile();">Change Profile Pic</button>
-                    <button type="submit" class="btn btn-success btn-sm" id="save_profile_pic_btn" form="profile_pic_form" style="display: none;">Save</button>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="chooseFile();">Change Profile Pic
+                    </button>
+                    <button type="submit" class="btn btn-success btn-sm" id="save_profile_pic_btn"
+                            form="profile_pic_form" style="display: none;">Save
+                    </button>
                 </div>
             </div>
 
@@ -271,14 +274,20 @@
                 </div>
 
 
-
             </form>
         </div>
 
         <div class="card-footer">
             <div class="form-group">
-                <div class="col-sm-offset-5 col-sm-2">
-                    <button type="submit" form="profile_form" class="btn btn-primary btn-block">Save</button>
+                <div class="row">
+                    <div class="col-sm-offset-5 col-sm-2">
+                        <button type="submit" form="profile_form" class="btn btn-primary btn-block">Save</button>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-danger btn-block" onclick="window.location.href='{{ change_password_url }}'">
+                            Change Password
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
