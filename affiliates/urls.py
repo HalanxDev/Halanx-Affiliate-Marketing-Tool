@@ -27,5 +27,7 @@ urlpatterns = [
     url(r'^referrals/upload/csv/$', views.referral_upload_csv_view, name='referral_upload_csv'),
     url(r'^referrals/list/$', views.referral_list_view, name='referral_list'),
 
+    url(r'^tools/qrcode/$', views.qrcode_request_view, name='qrcode_request'),
+
     url(r'^widgets/data.js', views.test_view),
 ]

@@ -75,3 +75,14 @@ def get_or_create_monthly_report(affiliate, month, year):
     monthly_report, _ = AffiliateMonthlyReport.objects.get_or_create(affiliate=affiliate, start_date=start_date,
                                                                      end_date=end_date)
     return monthly_report
+
+
+PENDING_APPROVAL = 'Pending Approval'
+PENDING_DELIVERY = 'Pending Delivery'
+DELIVERED = 'Delivered'
+
+QRCodeRequestStatusCategories = (
+    (PENDING_APPROVAL, PENDING_APPROVAL),
+    (PENDING_DELIVERY, PENDING_DELIVERY),
+    (DELIVERED, DELIVERED),
+)

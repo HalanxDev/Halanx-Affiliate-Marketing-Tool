@@ -1,9 +1,79 @@
 {% extends 'base/base.html' %}
+{% load static %}
 
 {% block title %}
-Dashboard
+    Dashboard
 {% endblock %}
 
 {% block content %}
-    <h1>Welcome!</h1>
+    <div class="container">
+
+        <div class="row">
+            <div class="col">
+                <h1 id="headline">Welcome to <span style="color: #cb2d2e">Halanx Affiliate Program</span> Dashboard!</h1>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-4 col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        Refer Tenants, Earn Money!
+                    </div>
+
+                    <div class="card-body">
+                        <p>Refer tenants and earn commission when they book a Halanx Home.</p>
+                    </div>
+
+                    <div class="card-footer">
+                        <button class="btn btn-primary" type="button" onclick="window.location.href='{{ referral_upload_url }}?type=tenant'">
+                            Upload Tenant Referrals
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        Refer House Owners, Earn Money!
+                    </div>
+
+                    <div class="card-body">
+                        <p>Refer house owners and earn commission when they sign agreement with  Halanx Homes.</p>
+                    </div>
+
+                    <div class="card-footer">
+                        <button class="btn btn-primary" type="button" onclick="window.location.href='{{ referral_upload_url }}?type=house_owner'">
+                            Upload House Owner Referrals
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        Request your QRCode!
+                    </div>
+
+                    <div class="card-body">
+                        <p>Request your personal QRCode to drive your offline campaign!</p>
+                    </div>
+
+                    <div class="card-footer">
+                        <button class="btn btn-primary" type="button" onclick="window.location.href='{{ qrcode_request_url }}'">
+                            Request QRCode
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        jQuery("#headline").fitText(1.2, { minFontSize: '10px', maxFontSize: '40px' });
+    </script>
 {% endblock %}

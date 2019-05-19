@@ -24,7 +24,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views.decorators.http import require_http_methods
 
 from affiliates.models import Affiliate, AffiliateOccupationCategory, AffiliateOrganisationTypeCategory, \
-    AffiliatePicture
+    AffiliatePicture, QRCodeRequest
 from affiliates.tokens import account_activation_token
 from affiliates.utils import send_account_verification_email, send_password_reset_email, get_referral_csv_upload_path, \
     get_or_create_monthly_report
@@ -385,6 +385,28 @@ def earnings_view(request):
     monthly_reports = affiliate.monthly_reports.all().order_by('-start_date')
     return render(request, 'earnings.html', {'affiliate': affiliate,
                                              'monthly_reports': monthly_reports})
+
+
+@affiliate_login_required
+@require_http_methods(['GET', 'POST'])
+def qrcode_request_view(request):
+    affiliate = Affiliate.objects.get(user=request.user)
+    if request.method == 'GET':
+        return render(request, 'qrcode_request.html', {'affiliate': affiliate})
+    elif request.method == 'POST':
+        data = request.POST
+        qrcode_request = QRCodeRequest.objects.create(affiliate=affiliate)
+        qrcode_request.phone_no = data.get('phone_no')
+        qrcode_request.save()
+
+        qrcode_request.delivery_address.street_address = data.get('street_address')
+        qrcode_request.delivery_address.city = data.get('city')
+        qrcode_request.delivery_address.state = data.get('state')
+        qrcode_request.delivery_address.pincode = data.get('pincode')
+        qrcode_request.delivery_address.country = data.get('country')
+        qrcode_request.delivery_address.save()
+        messages.success(request, "Your QRCode request was submitted successfully!")
+        return redirect(reverse(qrcode_request_view))
 
 
 def test_view(request):

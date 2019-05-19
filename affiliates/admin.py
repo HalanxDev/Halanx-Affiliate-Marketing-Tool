@@ -4,7 +4,7 @@ from django.utils.safestring import mark_safe
 
 from affiliates.models import Affiliate, AffiliateAddress, AffiliateOrganisation, AffiliateOrganisationAddress, \
     AffiliateOccupationCategory, AffiliateOrganisationTypeCategory, AffiliatePicture, AffiliateBankDetail, \
-    AffiliateWallet, AffiliateMonthlyReport, AffiliatePayment
+    AffiliateWallet, AffiliateMonthlyReport, AffiliatePayment, QRCodeRequest, QRCodeRequestDeliveryAddress
 
 
 @admin.register(AffiliateOccupationCategory)
@@ -102,3 +102,15 @@ class AffiliatePaymentAdmin(admin.ModelAdmin):
 @admin.register(AffiliateWallet)
 class AffiliateWalletAdmin(admin.ModelAdmin):
     pass
+
+
+class QRCodeRequestDeliveryAddressInline(admin.StackedInline):
+    model = QRCodeRequestDeliveryAddress
+
+
+@admin.register(QRCodeRequest)
+class QRCodeRequestAdmin(admin.ModelAdmin):
+    list_display = ('id', 'affiliate', 'timestamp', 'status', )
+    inlines = (
+        QRCodeRequestDeliveryAddressInline,
+    )

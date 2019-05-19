@@ -10,52 +10,73 @@
             </li>
 
             {% if request.user.is_authenticated %}
-            <li class="nav-item nav-dropdown">
-                <a class="nav-link nav-dropdown-toggle" href="#">
-                    <i class="nav-icon fa fa-upload"></i> Upload Referrals
-                </a>
-                <ul class="nav-dropdown-items">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ referral_upload_url }}?type=tenant">
-                            <i class="nav-icon cui-puzzle"></i>
-                            <span style="font-size: small">Tenant Referrals</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ referral_upload_url }}?type=house_owner">
-                            <i class="nav-icon cui-puzzle"></i>
-                            <span style="font-size: small">House Owner Referrals</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
 
-            <li class="nav-item nav-dropdown">
-                <a class="nav-link nav-dropdown-toggle" href="#">
-                    <i class="nav-icon fa fa-users"></i> My Referrals
-                </a>
-                <ul class="nav-dropdown-items">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ referral_list_url }}?type=tenant">
-                            <i class="nav-icon cui-puzzle"></i>
-                            <span style="font-size: small">Tenant Referrals</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ referral_list_url }}?type=house_owner">
-                            <i class="nav-icon cui-puzzle"></i>
-                            <span style="font-size: small">House Owner Referrals</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'earnings' %}">
+                        <i class="fa fa-money"></i>
+                        My Earnings
+                    </a>
+                </li>
 
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'earnings' %}">
-                    <i class="fa fa-money"></i>
-                    My Earnings
-                </a>
-            </li>
+                <li class="nav-item nav-dropdown">
+                    <a class="nav-link nav-dropdown-toggle" href="#">
+                        <i class="nav-icon fa fa-upload"></i> Upload Referrals
+                    </a>
+                    <ul class="nav-dropdown-items">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ referral_upload_url }}?type=tenant">
+                                <i class="nav-icon cui-puzzle"></i>
+                                <span style="font-size: small">Tenant Referrals</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ referral_upload_url }}?type=house_owner">
+                                <i class="nav-icon cui-puzzle"></i>
+                                <span style="font-size: small">House Owner Referrals</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item nav-dropdown">
+                    <a class="nav-link nav-dropdown-toggle" href="#">
+                        <i class="nav-icon fa fa-users"></i> My Referrals
+                    </a>
+                    <ul class="nav-dropdown-items">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ referral_list_url }}?type=tenant">
+                                <i class="nav-icon cui-puzzle"></i>
+                                <span style="font-size: small">Tenant Referrals</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ referral_list_url }}?type=house_owner">
+                                <i class="nav-icon cui-puzzle"></i>
+                                <span style="font-size: small">House Owner Referrals</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item nav-dropdown">
+                    <a class="nav-link nav-dropdown-toggle" href="#">
+                        <i class="nav-icon fa fa-bullhorn"></i> Affiliate Tools
+                    </a>
+                    <ul class="nav-dropdown-items">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ qrcode_request_url }}">
+                                <i class="nav-icon cui-puzzle"></i>
+                                <span style="font-size: small">QRCode</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="nav-icon cui-puzzle"></i>
+                                <span style="font-size: small">Widget</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
             {% endif %}
 
             <li class="nav-item">

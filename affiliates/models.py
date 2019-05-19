@@ -7,7 +7,8 @@ from django.utils.html import format_html
 
 from affiliates.utils import default_profile_pic_url, \
     default_profile_pic_thumbnail_url, get_picture_upload_path, get_thumbnail_upload_path, \
-    DEFAULT_TENANT_CONVERSION_COMMISSION, DEFAULT_HOUSE_OWNER_CONVERSION_COMMISSION, update_monthly_report_start_balance
+    DEFAULT_TENANT_CONVERSION_COMMISSION, DEFAULT_HOUSE_OWNER_CONVERSION_COMMISSION, \
+    update_monthly_report_start_balance, QRCodeRequestStatusCategories, PENDING_APPROVAL
 from common.models import AddressDetail, BankDetail, Wallet
 from common.utils import PENDING, PaymentStatusCategories, PAID
 from referrals.utils import SUCCESS
@@ -196,6 +197,24 @@ class OTP(models.Model):
         return str(self.id)
 
 
+class QRCodeRequest(models.Model):
+    affiliate = models.ForeignKey('Affiliate', on_delete=models.CASCADE, related_name='qrcode_requests')
+    status = models.CharField(max_length=100, default=PENDING_APPROVAL, choices=QRCodeRequestStatusCategories)
+    phone_no = models.CharField(max_length=20, blank=True, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ('-timestamp', )
+
+    def __str__(self):
+        return str(self.id)
+
+
+class QRCodeRequestDeliveryAddress(AddressDetail):
+    qrcode_request = models.OneToOneField('QRCodeRequest', on_delete=models.CASCADE, related_name='delivery_address')
+
+
 # noinspection PyUnusedLocal
 @receiver(post_save, sender=Affiliate)
 def affiliate_post_save_hook(sender, instance, created, **kwargs):
@@ -245,3 +264,9 @@ def affiliate_payment_post_save_hook(sender, instance, created, **kwargs):
     wallet.save()
     update_monthly_report_start_balance(instance.wallet.affiliate)
 
+
+# noinspection PyUnusedLocal
+@receiver(post_save, sender=QRCodeRequest)
+def qrcode_request_post_save_hook(sender, instance, created, **kwargs):
+    if created:
+        QRCodeRequestDeliveryAddress(qrcode_request=instance).save()
