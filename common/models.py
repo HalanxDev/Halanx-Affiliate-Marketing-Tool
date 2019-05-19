@@ -42,3 +42,20 @@ class BankDetail(models.Model):
     def __str__(self):
         return str(self.id)
 
+
+class Wallet(models.Model):
+    credit = models.FloatField(default=0)
+    debit = models.FloatField(default=0)
+    balance = models.FloatField(default=0)
+    pending_deposit = models.FloatField(default=0)
+    pending_withdrawal = models.FloatField(default=0)
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return str(self.id)
+
+    def save(self, *args, **kwargs):
+        self.balance = round(self.credit - self.debit, 2)
+        super(Wallet, self).save(*args, **kwargs)

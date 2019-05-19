@@ -24,6 +24,9 @@ def get_referral_csv_upload_path(instance, filename):
 default_profile_pic_url = "https://d28fujbigzf56k.cloudfront.net/static/img/nopic.jpg"
 default_profile_pic_thumbnail_url = "https://d28fujbigzf56k.cloudfront.net/static/img/nopic_small.jpg"
 
+DEFAULT_TENANT_CONVERSION_COMMISSION = 100
+DEFAULT_HOUSE_OWNER_CONVERSION_COMMISSION = 1000
+
 
 def send_account_verification_email(email, message):
     sg = sendgrid.SendGridAPIClient(api_key=config("SENDGRID_API_KEY"))

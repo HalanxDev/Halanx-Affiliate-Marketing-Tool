@@ -3,7 +3,8 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from affiliates.models import Affiliate, AffiliateAddress, AffiliateOrganisation, AffiliateOrganisationAddress, \
-    AffiliateOccupationCategory, AffiliateOrganisationTypeCategory, AffiliatePicture, AffiliateBankDetail
+    AffiliateOccupationCategory, AffiliateOrganisationTypeCategory, AffiliatePicture, AffiliateBankDetail, \
+    AffiliateWallet, AffiliateMonthlyReport
 
 
 @admin.register(AffiliateOccupationCategory)
@@ -22,6 +23,10 @@ class AffiliateAddressInline(admin.StackedInline):
 
 class AffiliateBankDetailInline(admin.StackedInline):
     model = AffiliateBankDetail
+
+
+class AffiliateWalletInline(admin.StackedInline):
+    model = AffiliateWallet
 
 
 class AffiliateOrganisationInline(admin.StackedInline):
@@ -58,6 +63,12 @@ class AffiliatePictureTabular(admin.TabularInline):
     ordering = ('-timestamp',)
 
 
+class AffiliateMonthlyReportTabular(admin.TabularInline):
+    model = AffiliateMonthlyReport
+    extra = 0
+    ordering = ('-start_date',)
+
+
 @admin.register(Affiliate)
 class AffiliateAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'occupation', 'organisation_name', 'get_profile_pic_html', 'verified')
@@ -66,6 +77,8 @@ class AffiliateAdmin(admin.ModelAdmin):
         AffiliateAddressInline,
         AffiliateOrganisationInline,
         AffiliateBankDetailInline,
+        AffiliateWalletInline,
+        AffiliateMonthlyReportTabular,
         AffiliatePictureTabular,
     )
 

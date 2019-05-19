@@ -6,8 +6,10 @@ from django.dispatch import receiver
 from django.utils.html import format_html
 
 from affiliates.utils import default_profile_pic_url, \
-    default_profile_pic_thumbnail_url, get_picture_upload_path, get_thumbnail_upload_path
-from common.models import AddressDetail, BankDetail
+    default_profile_pic_thumbnail_url, get_picture_upload_path, get_thumbnail_upload_path, \
+    DEFAULT_TENANT_CONVERSION_COMMISSION, DEFAULT_HOUSE_OWNER_CONVERSION_COMMISSION
+from common.models import AddressDetail, BankDetail, Wallet
+from common.utils import PENDING, PaymentStatusCategories, PAID
 from utility.image_utils import compress_image
 from utility.random_utils import generate_random_code
 
@@ -21,6 +23,9 @@ class Affiliate(models.Model):
     profile_pic_url = models.CharField(max_length=500, blank=True, null=True, default=default_profile_pic_url)
     profile_pic_thumbnail_url = models.CharField(max_length=500, blank=True, null=True,
                                                  default=default_profile_pic_thumbnail_url)
+
+    tenant_conversion_commission = models.FloatField(default=DEFAULT_TENANT_CONVERSION_COMMISSION)
+    house_owner_conversion_commission = models.FloatField(default=DEFAULT_HOUSE_OWNER_CONVERSION_COMMISSION)
 
     active = models.BooleanField(default=True)
     verified = models.BooleanField(default=False)
@@ -56,10 +61,6 @@ class AffiliateBankDetail(BankDetail):
     affiliate = models.OneToOneField('Affiliate', on_delete=models.CASCADE, related_name='bank_detail')
 
 
-class AffiliateOrganisationAddress(AddressDetail):
-    organisation = models.OneToOneField('AffiliateOrganisation', on_delete=models.CASCADE, related_name='address')
-
-
 class AffiliateOccupationCategory(models.Model):
     name = models.CharField(max_length=500, blank=True, null=True)
 
@@ -91,6 +92,10 @@ class AffiliateOrganisation(models.Model):
         return str(self.name)
 
 
+class AffiliateOrganisationAddress(AddressDetail):
+    organisation = models.OneToOneField('AffiliateOrganisation', on_delete=models.CASCADE, related_name='address')
+
+
 class AffiliatePicture(models.Model):
     affiliate = models.ForeignKey('Affiliate', on_delete=models.SET_NULL, null=True, related_name='pictures')
     image = models.ImageField(upload_to=get_picture_upload_path, null=True, blank=True)
@@ -116,6 +121,52 @@ class AffiliatePicture(models.Model):
         super(AffiliatePicture, self).save(*args, **kwargs)
 
 
+class AffiliateMonthlyReport(models.Model):
+    affiliate = models.ForeignKey('Affiliate', on_delete=models.SET_NULL, null=True, related_name='monthly_reports')
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+
+    earning = models.FloatField(default=0)
+    tenant_conversion_count = models.IntegerField(default=0)
+    house_owner_conversion_count = models.IntegerField(default=0)
+
+    start_balance = models.FloatField(default=0)
+    end_balance = models.FloatField(default=0)
+
+    class Meta:
+        ordering = ('start_date', )
+
+    def __str__(self):
+        return str(self.id)
+
+    def save(self, *args, **kwargs):
+        self.earning = (self.affiliate.tenant_conversion_commission * self.tenant_conversion_count +
+                        self.affiliate.house_owner_conversion_commission * self.house_owner_conversion_count)
+        super(AffiliateMonthlyReport, self).save(*args, **kwargs)
+
+
+class AffiliateWallet(Wallet):
+    affiliate = models.OneToOneField('Affiliate', on_delete=models.PROTECT, related_name='wallet')
+
+    def __str__(self):
+        return str(self.affiliate.name)
+
+
+class AffiliatePayment(models.Model):
+    wallet = models.ForeignKey('AffiliateWallet', on_delete=models.SET_NULL, null=True, related_name='payments')
+    amount = models.FloatField(default=0)
+    description = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=30, default=PENDING, choices=PaymentStatusCategories)
+    due_date = models.DateTimeField(blank=True, null=True)
+    paid_on = models.DateTimeField(blank=True, null=True)
+
+    timestamp = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.id)
+
+
 class OTP(models.Model):
     phone_no = models.CharField(max_length=30)
     password = models.IntegerField(null=True, blank=True)
@@ -132,6 +183,7 @@ def affiliate_post_save_hook(sender, instance, created, **kwargs):
         AffiliateOrganisation(affiliate=instance).save()
         AffiliateAddress(affiliate=instance).save()
         AffiliateBankDetail(affiliate=instance).save()
+        AffiliateWallet(affiliate=instance).save()
         super(Affiliate, instance).save()
 
 
@@ -154,3 +206,20 @@ def affiliate_picture_post_save_task(sender, instance, *args, **kwargs):
         if last_profile_pic:
             last_profile_pic.is_profile_pic = False
             super(AffiliatePicture, last_profile_pic).save()
+
+
+# noinspection PyUnusedLocal
+@receiver(post_save, sender=AffiliateMonthlyReport)
+def affiliate_payment_post_save_hook(sender, instance, created, **kwargs):
+    wallet = instance.affiliate.wallet
+    wallet.credit = sum(monthly_report.earning for monthly_report in instance.affiliate.monthly_reports.all())
+    wallet.save()
+
+
+# noinspection PyUnusedLocal
+@receiver(post_save, sender=AffiliatePayment)
+def affiliate_payment_post_save_hook(sender, instance, created, **kwargs):
+    wallet = instance.wallet
+    wallet.debit = sum(payment.amount for payment in wallet.payments.filter(status=PAID))
+    wallet.pending_withdrawal = sum(payment.amount for payment in wallet.payments.filter(status=PENDING))
+    wallet.save()
