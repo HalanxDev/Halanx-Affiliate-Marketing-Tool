@@ -7,13 +7,16 @@
 
 
 {% block content %}
-    {% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
+    <div class="row">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="col alert {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}alert-success{% elif message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}alert-warning{% endif %}">
+                    <span class="">{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
     <div class="row">
         <div class="col-lg-6 col-sm-12">
             <div class="card">
@@ -168,7 +171,8 @@
                 </div>
 
                 <div class="card-body">
-                    <form class="form-horizontal" id="referral_upload_csv" method="post" action="{{ referral_upload_csv_url }}"
+                    <form class="form-horizontal" id="referral_upload_csv" method="post"
+                          action="{{ referral_upload_csv_url }}"
                           enctype="multipart/form-data">
                         {% csrf_token %}
                         <input type="hidden" name="referral_type" value="{{ referral_type }}">
@@ -193,7 +197,7 @@
                                         <span class="fa fa-upload" style="margin-right:5px;"></span>Upload
                                     </button>
                                 </div>
-                                 <div class="col-sm-5 text-right" style="margin-bottom:10px;">
+                                <div class="col-sm-5 text-right" style="margin-bottom:10px;">
                                     <button class="btn btn-default"
                                             onclick="window.open('{% get_static_prefix %}/misc/{{ referral_type }}_referral_bulk_upload_sample.csv')">
                                         <span class="fa fa-download" style="margin-right:5px;"></span>Download Sample

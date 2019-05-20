@@ -72,7 +72,7 @@ def login_view(request):
                     if next_page:
                         return HttpResponseRedirect(next_page)
                     else:
-                        return HttpResponseRedirect(reverse(home_page))
+                        return HttpResponseRedirect(reverse(dashboard_view))
                 else:
                     error_msg = 'You need to activate your account by verifying your email ID.'
             else:
@@ -85,7 +85,7 @@ def login_view(request):
 @require_http_methods(['GET', 'POST'])
 def register_view(request):
     if request.user.is_authenticated:
-        return redirect('home_page')
+        return redirect(reverse(dashboard_view))
 
     if request.method == 'GET':
         return render(request, 'account/register.html')
@@ -136,7 +136,7 @@ def change_password_view(request):
             user = form.save()
             update_session_auth_hash(request, user)
             messages.success(request, 'Your password was successfully updated!')
-            return redirect('change_password')
+            return redirect(reverse(change_password_view))
         else:
             messages.error(request, 'Please correct the error below.')
     else:
@@ -162,7 +162,7 @@ def activate(request, uidb64, token):
         user.affiliate.verified = True
         user.save()
         login(request, user)
-        return redirect('home_page')
+        return redirect(reverse(dashboard_view))
     else:
         return render(request, 'account/account_activation_invalid.html')
 
@@ -181,7 +181,7 @@ class CustomPasswordResetView(PasswordResetView):
 @require_http_methods(['GET'])
 def home_page(request):
     if request.user.is_authenticated and is_affiliate(request.user):
-        return redirect('dashboard')
+        return redirect(reverse(dashboard_view))
     return render(request, 'home.html')
 
 
@@ -266,13 +266,10 @@ def referral_upload_view(request):
         gender = data.get('gender')
         email = data.get('email')
 
-        error = None
-        msg = None
-
         if referral_type == TENANT_REFERRAL:
             if TenantReferral.objects.filter(affiliate=affiliate, phone_no=phone_no,
                                              timestamp__gte=timezone.now() - timedelta(days=30)).exists():
-                error = "Duplicate Tenant Referral!"
+                messages.error(request, "Duplicate Tenant Referral!")
             else:
                 preferred_location = data.get('preferred_location')
                 expected_rent = get_number(data.get('expected_rent'))
@@ -285,11 +282,11 @@ def referral_upload_view(request):
                                               expected_movein_date=expected_movein_date,
                                               accomodation_for=accomodation_for, accomodation_type=accomodation_type,
                                               source=DASHBOARD_FORM_SOURCE)
-                msg = "Referral was submitted successfully."
+                messages.success(request, "Referral was submitted successfully.")
         elif referral_type == HOUSE_OWNER_REFERRAL:
             if HouseOwnerReferral.objects.filter(affiliate=affiliate, phone_no=phone_no,
                                                  timestamp__gte=timezone.now() - timedelta(days=30)).exists():
-                error = "Duplicate House Owner Referral!"
+                messages.error(request, "Duplicate House Owner Referral!")
             else:
                 house_address = data.get('house_address')
                 house_type = data.get('house_type')
@@ -297,8 +294,8 @@ def referral_upload_view(request):
                 HouseOwnerReferral.objects.create(affiliate=affiliate, name=name, phone_no=phone_no, gender=gender,
                                                   email=email, house_address=house_address, bhk_count=bhk_count,
                                                   house_type=house_type, source=DASHBOARD_FORM_SOURCE)
-                msg = "Referral was submitted successfully."
-        return render(request, 'referral_upload.html', {'msg': msg, 'error': error, **metadata})
+                messages.success(request, "Referral was submitted successfully.")
+        return HttpResponseRedirect(build_url('referral_upload', params={'type': referral_type}))
 
 
 @affiliate_login_required
@@ -350,12 +347,12 @@ def referral_upload_csv_view(request):
                                                           house_type=row.get('House Type'),
                                                           source=DASHBOARD_BULK_UPLOAD_SOURCE)
                         count += 1
-            messages.info(request, "{} referrals were submitted successfully!".format(count))
+            messages.success(request, "{} referrals were submitted successfully!".format(count))
         else:
             messages.error(request, "File does not contain required headers `Name` and `Phone Number`.")
     except Exception as e:
         messages.error(request, "Unable to upload file. " + repr(e))
-    return HttpResponseRedirect(build_url('referral_upload_view', params={'type': referral_type}))
+    return HttpResponseRedirect(build_url('referral_upload', params={'type': referral_type}))
 
 
 @affiliate_login_required
@@ -371,7 +368,7 @@ def referral_list_view(request):
     elif referral_type == HOUSE_OWNER_REFERRAL:
         referrals_list = HouseOwnerReferral.objects.filter(affiliate=affiliate)
     else:
-        return redirect('home_page')
+        return redirect(reverse(dashboard_view))
     paginator = Paginator(referrals_list, 10)
     referrals = paginator.get_page(page)
     return render(request, 'referral_list.html', {'referrals': referrals, **metadata})
