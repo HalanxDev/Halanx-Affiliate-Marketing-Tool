@@ -1,1 +1,81 @@
-{% extends 'base/base.html' %}
+<!DOCTYPE html>
+<html>
+
+{% load static %}
+{% include 'base/header.html' %}
+{% block extraheader %}
+    <link rel="stylesheet" href="{% static 'main/css/landing.css' %}">
+    <title>Halanx Affiliate Program</title>
+{% endblock %}
+
+{% url 'login' as login_url %}
+{% url 'logout' as logout_url %}
+{% url 'register' as register_url %}
+{% url 'home_page' as home_page_url %}
+{% url 'dashboard' as dashboard_url %}
+
+
+<body class="app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden">
+
+{% include 'base/navbar.html' %}
+
+<main>
+    <div id="banner">
+        <img src="{% static 'img/hh-home.jpg' %}" alt="">
+        <div class="overlay"></div>
+        <div class="banner-text">
+            <h1>Become Halanx Affiliate Partner</h1>
+            <p>And earn money with minimum efforts.</p>
+            <button class="btn-theme" type="button" onclick="window.location.href='{{ register_url }}'">Get Started</button>
+        </div>
+    </div>
+    <div id="working">
+        <h2>What to do?</h2>
+        <div class="steps">
+            <div class="step">
+                <p class="icon num">01</p>
+                <div class="content">
+                    <div>
+                        <p class="tt">Register</p>
+                        <p class="st">
+                            Sign up and complete your profile
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="step">
+                <p class="icon num">02</p>
+                <div class="content">
+                    <div>
+                        <p class="tt">Generate Leads</p>
+                        <p class="st">
+                            Submit tenant and house owner details via form, qr code, widget and link.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="step">
+                <p class="icon num">03</p>
+                <div class="content">
+                    <div>
+                        <p class="tt">Earn money</p>
+                        <p class="st">
+                            Get money in your wallet and then in bank account when leads are converted.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button style="margin: 12px auto;" class="btn-theme" type="button" onclick="window.location.href='{{ register_url }}'">Register now!</button>
+    <div id="contact">
+        <h2>For any further queries,</h2>
+        <h3>Please contact &nbsp;<a href="tel:9999202842"><i class="fa fa-phone"></i>&nbsp;+91 9999202842</a></h3>
+    </div>
+</main>
+
+
+<!--JS-->
+{% include 'base/js.html' %}
+</body>
+</html>

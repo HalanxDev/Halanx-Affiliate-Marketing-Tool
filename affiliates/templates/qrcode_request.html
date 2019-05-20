@@ -1,7 +1,7 @@
 {% extends 'base/base.html' %}
 
 {% block title %}
-    QRCode
+    QR Code
 {% endblock %}
 
 {% block content %}
@@ -21,7 +21,7 @@
         <div class="col-lg-6 col-sm-12">
             <div class="card">
                 <div class="card-header">
-                    Create New QRCode Request
+                    Create New QR Code Request
                 </div>
 
                 <div class="card-body">
@@ -95,10 +95,11 @@
         <div class="col-lg-6 col-sm-12">
             <div class="card">
                 <div class="card-header">
-                    Your QRCode Request
+                    Your QR Code Request
                 </div>
 
                 <div class="card-body">
+                    {% if affiliate.qrcode_requests.all|length != 0 %}
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped">
                             <thead>
@@ -120,6 +121,9 @@
                             </tbody>
                         </table>
                     </div>
+                    {% else %}
+                        You have not created any QR Code delivery requests.
+                    {% endif %}
                 </div>
             </div>
         </div>
