@@ -17,7 +17,11 @@
 
 <body class="app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden">
 
-{% include 'base/navbar.html' %}
+<header class="app-header navbar">
+    <a class="navbar-brand" href="{{ home_page_url }}">
+        <img src="{% static "img/halanx.png" %}" style="display: inline-block; height: 30px; margin-top: -5px; vertical-align:middle;"> Halanx Affiliate
+    </a>
+</header>
 
 <main>
     <div id="banner">
