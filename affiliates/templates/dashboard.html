@@ -16,16 +16,20 @@
 
         <div class="row">
             <div class="col-lg-4 col-md-6">
-                <div class="card">
+                <div class="card no-gutters">
                     <div class="card-header">
                         Refer Tenants, Earn Money!
+                    </div>
+
+                    <div class="card-img img-responsive">
+                        <img class="card-img-top" src="{% static 'img/refer-tenant.png' %}">
                     </div>
 
                     <div class="card-body">
                         <p>Refer tenants and earn commission when they book a Halanx Home.</p>
                     </div>
 
-                    <div class="card-footer">
+                    <div class="card-footer text-center">
                         <button class="btn btn-primary" type="button" onclick="window.location.href='{{ referral_upload_url }}?type=tenant'">
                             Upload Tenant Referrals
                         </button>
@@ -39,11 +43,15 @@
                         Refer House Owners, Earn Money!
                     </div>
 
+                    <div class="card-img img-responsive">
+                        <img class="card-img-top" src="{% static 'img/refer-owner.png' %}">
+                    </div>
+
                     <div class="card-body">
                         <p>Refer house owners and earn commission when they sign agreement with  Halanx Homes.</p>
                     </div>
 
-                    <div class="card-footer">
+                    <div class="card-footer text-center">
                         <button class="btn btn-primary" type="button" onclick="window.location.href='{{ referral_upload_url }}?type=house_owner'">
                             Upload House Owner Referrals
                         </button>
@@ -57,11 +65,15 @@
                         Request your QRCode!
                     </div>
 
+                    <div class="card-img img-responsive">
+                        <img class="card-img-top" src="{% static 'img/request-qr.png' %}">
+                    </div>
+
                     <div class="card-body">
                         <p>Request your personal QRCode to drive your offline campaign!</p>
                     </div>
 
-                    <div class="card-footer">
+                    <div class="card-footer text-center">
                         <button class="btn btn-primary" type="button" onclick="window.location.href='{{ qrcode_request_url }}'">
                             Request QRCode
                         </button>
