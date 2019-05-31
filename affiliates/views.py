@@ -173,6 +173,13 @@ class CustomPasswordResetForm(PasswordResetForm):
         body = loader.render_to_string(email_template_name, context)
         send_password_reset_email(to_email, body)
 
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if not User.objects.filter(email__iexact=email, is_active=True).exists():
+            msg = "There is no user registered with the specified E-Mail address."
+            self.add_error('email', msg)
+        return email
+
 
 class CustomPasswordResetView(PasswordResetView):
     form_class = CustomPasswordResetForm

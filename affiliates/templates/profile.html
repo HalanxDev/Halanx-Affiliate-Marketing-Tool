@@ -23,7 +23,7 @@
 
         <div class="card-body">
 
-            <div class="row" style="margin-bottom: 20px;">
+            <div class="row mb-2">
                 <div class="col">
                     <img src="{{ affiliate.profile_pic_url }}" id="profile_pic_preview" height="100" width="100"
                          style="border-radius: 6px; margin-bottom: 10px;">
@@ -39,6 +39,12 @@
                     <button type="submit" class="btn btn-success btn-sm" id="save_profile_pic_btn"
                             form="profile_pic_form" style="display: none;">Save
                     </button>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col">
+                    My Unique Code: <span class="badge-info badge-pill pt-1 pb-1 pr-3 pl-3">{{ affiliate.unique_code }}</span>
                 </div>
             </div>
 
@@ -272,7 +278,6 @@
                         </div>
                     </div>
                 </div>
-
 
             </form>
         </div>
