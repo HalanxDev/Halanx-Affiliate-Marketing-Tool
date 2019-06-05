@@ -100,7 +100,7 @@ def register_view(request):
         last_name = data.get('last_name')
         password = data.get('password')
         phone_no = data.get('phone_no')
-        username = generate_random_code(initials=first_name.lower(), n=3, alphabets=False,
+        username = generate_random_code(initials=first_name.lower()[:3], n=5, alphabets=False,
                                         existing_codes=User.objects.values_list('username', flat=True))
 
         # create user
