@@ -1,9 +1,12 @@
 from django.conf.urls import url
 from django.contrib.auth import views as auth_views
+from django.urls import include
 
 from affiliates import views
 
 urlpatterns = [
+    url(r'^api/', include('affiliates.api.urls')),
+
     url(r'^$', views.home_page, name='home_page'),
     url(r'^login/$', views.login_view, name='login'),
     url(r'^logout/$', views.logout_view, name='logout'),

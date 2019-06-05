@@ -16,6 +16,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
 
     'corsheaders',
+    'rest_framework',
 
     'affiliates',
     'referrals',
