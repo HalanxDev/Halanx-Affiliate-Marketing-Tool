@@ -39,7 +39,7 @@ class Affiliate(models.Model):
     def save(self, *args, **kwargs):
         if not self.pk:
             existing_codes = Affiliate.objects.values_list('unique_code', flat=True)
-            self.unique_code = generate_random_code(initials=self.user.first_name.lower(), n=3,
+            self.unique_code = generate_random_code(initials=self.user.first_name.lower()[:3], n=5,
                                                     existing_codes=existing_codes)
         super(Affiliate, self).save(*args, **kwargs)
 
