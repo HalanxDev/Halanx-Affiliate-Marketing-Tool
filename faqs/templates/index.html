@@ -113,7 +113,7 @@ FAQs
                             </div>
                             <div class="collapse {% if forloop.counter == 1 %}show{% endif %}" id="accordion-tab-{{ forloop.parentloop.counter }}-content-{{ forloop.counter }}" aria-labelledby="accordion-tab-{{ forloop.parentloop.counter }}-heading-{{ forloop.counter }}" data-parent="#accordion-tab-1">
                                 <div class="card-body">
-                                    <p>{{ question.answer|linebreaks }}</p>
+                                    <p>{% autoescape off %}{{ question.answer|linebreaks }}{% endautoescape %}</p>
                                 </div>
                             </div>
                         </div>
