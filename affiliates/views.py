@@ -262,6 +262,7 @@ def profile_view(request):
 @affiliate_login_required
 @require_http_methods(['GET', 'POST'])
 def referral_upload_view(request):
+    print('inside referral upload view')
     affiliate = Affiliate.objects.get(user=request.user)
     referral_type = request.GET.get('type')
     metadata = {'referral_type': referral_type,
