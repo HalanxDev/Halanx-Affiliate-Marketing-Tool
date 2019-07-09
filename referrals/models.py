@@ -18,6 +18,7 @@ class Referral(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     converted_at = models.DateTimeField(blank=True, null=True)
+    lead_published = models.BooleanField(default=False)
 
     class Meta:
         abstract = True

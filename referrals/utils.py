@@ -60,3 +60,6 @@ ReferralSourceChoices = (
     (WEBSITE_ENQUIRY_SOURCE, WEBSITE_ENQUIRY_SOURCE),
     (WEBSITE_LOGIN_SOURCE, WEBSITE_LOGIN_SOURCE),
 )
+
+TENANT_LEAD_FIELDS_PRESENT_IN_TENANT_REFERRAL_FIELDS = ('name', 'gender', 'phone_no', 'email',  'accomodation_for')
+OWNER_LEAD_FIELDS_PRESENT_IN_OWNER_REFERRAL_FIELDS = ('name', 'gender', 'phone_no', 'email')

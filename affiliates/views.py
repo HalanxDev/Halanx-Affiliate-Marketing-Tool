@@ -28,6 +28,8 @@ from affiliates.models import Affiliate, AffiliateOccupationCategory, AffiliateO
 from affiliates.tokens import account_activation_token
 from affiliates.utils import send_account_verification_email, send_password_reset_email, get_referral_csv_upload_path, \
     get_or_create_monthly_report
+from referrals.api.tasks_affiliate_lead_management import send_tenant_referral_to_lead_tool_to_generate_lead, \
+    send_owner_referral_to_lead_tool_to_generate_lead
 from referrals.models import TenantReferral, HouseOwnerReferral
 from referrals.utils import TENANT_REFERRAL, DASHBOARD_FORM_SOURCE, HOUSE_OWNER_REFERRAL, DASHBOARD_BULK_UPLOAD_SOURCE
 from utility.form_field_utils import get_number, get_datetime
@@ -283,12 +285,19 @@ def referral_upload_view(request):
                 expected_movein_date = get_datetime(data.get('expected_movein_date'))
                 accomodation_for = data.get('accomodation_for')
                 accomodation_type = data.get('accomodation_type')
-                TenantReferral.objects.create(affiliate=affiliate, name=name, phone_no=phone_no, gender=gender,
-                                              email=email,
-                                              preferred_location=preferred_location, expected_rent=expected_rent,
-                                              expected_movein_date=expected_movein_date,
-                                              accomodation_for=accomodation_for, accomodation_type=accomodation_type,
-                                              source=DASHBOARD_FORM_SOURCE)
+                tenant_referral = TenantReferral.objects.create(affiliate=affiliate, name=name, phone_no=phone_no,
+                                                                gender=gender,
+                                                                email=email,
+                                                                preferred_location=preferred_location,
+                                                                expected_rent=expected_rent,
+                                                                expected_movein_date=expected_movein_date,
+                                                                accomodation_for=accomodation_for,
+                                                                accomodation_type=accomodation_type,
+                                                                source=DASHBOARD_FORM_SOURCE)
+                try:
+                    send_tenant_referral_to_lead_tool_to_generate_lead(tenant_referral)
+                except Exception as E:
+                    print(E, 'here')
                 messages.success(request, "Referral was submitted successfully.")
         elif referral_type == HOUSE_OWNER_REFERRAL:
             if HouseOwnerReferral.objects.filter(affiliate=affiliate, phone_no=phone_no,
@@ -298,9 +307,15 @@ def referral_upload_view(request):
                 house_address = data.get('house_address')
                 house_type = data.get('house_type')
                 bhk_count = data.get('bhk_count')
-                HouseOwnerReferral.objects.create(affiliate=affiliate, name=name, phone_no=phone_no, gender=gender,
-                                                  email=email, house_address=house_address, bhk_count=bhk_count,
-                                                  house_type=house_type, source=DASHBOARD_FORM_SOURCE)
+                owner_referral = HouseOwnerReferral.objects.create(affiliate=affiliate, name=name, phone_no=phone_no,
+                                                                   gender=gender,
+                                                                   email=email, house_address=house_address,
+                                                                   bhk_count=bhk_count,
+                                                                   house_type=house_type, source=DASHBOARD_FORM_SOURCE)
+                try:
+                    send_owner_referral_to_lead_tool_to_generate_lead(owner_referral)
+                except Exception as E:
+                    print(E, 'here')
                 messages.success(request, "Referral was submitted successfully.")
         return HttpResponseRedirect(build_url('referral_upload', params={'type': referral_type}))
 
