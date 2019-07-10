@@ -1,8 +1,11 @@
 import json
+import traceback
 from datetime import timedelta
 
 import pandas as pd
 from io import StringIO
+
+import sys
 from decouple import config
 from django.contrib import messages
 from django.contrib.auth import logout, authenticate, login, get_user_model, update_session_auth_hash
@@ -28,8 +31,9 @@ from affiliates.models import Affiliate, AffiliateOccupationCategory, AffiliateO
 from affiliates.tokens import account_activation_token
 from affiliates.utils import send_account_verification_email, send_password_reset_email, get_referral_csv_upload_path, \
     get_or_create_monthly_report
-from referrals.api.tasks_affiliate_lead_management import send_tenant_referral_to_lead_tool_to_generate_lead, \
-    send_owner_referral_to_lead_tool_to_generate_lead
+from referrals.tasks.tasks_affiliate_lead_management import send_tenant_referral_to_lead_tool_to_generate_lead, \
+    send_owner_referral_to_lead_tool_to_generate_lead, send_tenant_csv_referral_to_lead_tool_to_generate_leads, \
+    send_owner_csv_referral_to_lead_tool_to_generate_leads
 from referrals.models import TenantReferral, HouseOwnerReferral
 from referrals.utils import TENANT_REFERRAL, DASHBOARD_FORM_SOURCE, HOUSE_OWNER_REFERRAL, DASHBOARD_BULK_UPLOAD_SOURCE
 from utility.form_field_utils import get_number, get_datetime
@@ -343,33 +347,59 @@ def referral_upload_csv_view(request):
 
         if 'Name' in df.columns and 'Phone Number' in df.columns:
             count = 0
+            tenant_referrals = []
+            owner_referrals = []
+
             for row in df.to_dict('records'):
                 if referral_type == TENANT_REFERRAL:
                     if not TenantReferral.objects.filter(affiliate=affiliate, phone_no=row['Phone Number'],
                                                          timestamp__gte=timezone.now() - timedelta(days=30)).exists():
-                        TenantReferral.objects.create(affiliate=affiliate, phone_no=row['Phone Number'],
-                                                      email=row.get('Email'), name=row['Name'],
-                                                      gender=row.get('Gender'),
-                                                      preferred_location=row.get('Preferred Location'),
-                                                      expected_rent=row.get('Expected Rent'),
-                                                      expected_movein_date=get_datetime(
-                                                          row.get('Expected Move-In Date')),
-                                                      accomodation_for=row.get('Accomodation For'),
-                                                      accomodation_type=row.get('Accomodation Type'),
-                                                      source=DASHBOARD_BULK_UPLOAD_SOURCE)
+                        tenant_referral = TenantReferral.objects.create(affiliate=affiliate,
+                                                                        phone_no=row['Phone Number'],
+                                                                        email=row.get('Email'), name=row['Name'],
+                                                                        gender=row.get('Gender'),
+                                                                        preferred_location=row.get(
+                                                                            'Preferred Location'),
+                                                                        expected_rent=row.get('Expected Rent'),
+                                                                        expected_movein_date=get_datetime(
+                                                                            row.get('Expected Move-In Date')),
+                                                                        accomodation_for=row.get('Accomodation For'),
+                                                                        accomodation_type=row.get('Accomodation Type'),
+                                                                        source=DASHBOARD_BULK_UPLOAD_SOURCE)
+
+                        tenant_referrals.append(tenant_referral)
                         count += 1
+
                 elif referral_type == HOUSE_OWNER_REFERRAL:
                     if not HouseOwnerReferral.objects.filter(affiliate=affiliate, phone_no=row['Phone Number'],
                                                              timestamp__gte=timezone.now() - timedelta(days=30)
                                                              ).exists():
-                        HouseOwnerReferral.objects.create(affiliate=affiliate, phone_no=row['Phone Number'],
-                                                          email=row.get('Email'), name=row['Name'],
-                                                          gender=row.get('Gender'),
-                                                          house_address=row.get('House Address'),
-                                                          bhk_count=row.get('BHK Count'),
-                                                          house_type=row.get('House Type'),
-                                                          source=DASHBOARD_BULK_UPLOAD_SOURCE)
+                        owner_referral = HouseOwnerReferral.objects.create(affiliate=affiliate,
+                                                                           phone_no=row['Phone Number'],
+                                                                           email=row.get('Email'), name=row['Name'],
+                                                                           gender=row.get('Gender'),
+                                                                           house_address=row.get('House Address'),
+                                                                           bhk_count=row.get('BHK Count'),
+                                                                           house_type=row.get('House Type'),
+                                                                           source=DASHBOARD_BULK_UPLOAD_SOURCE)
+
+                        owner_referrals.append(owner_referral)
                         count += 1
+
+            # Send referrals to Lead Tool
+
+            if referral_type == TENANT_REFERRAL:
+                try:
+                    send_tenant_csv_referral_to_lead_tool_to_generate_leads(tenant_referrals)
+                except Exception as E:
+                    print(E, traceback.print_exc())
+
+            elif referral_type == HOUSE_OWNER_REFERRAL:
+                try:
+                    send_owner_csv_referral_to_lead_tool_to_generate_leads(owner_referrals)
+                except Exception as E:
+                    print(E, traceback.print_exc())
+
             messages.success(request, "{} referrals were submitted successfully!".format(count))
         else:
             messages.error(request, "File does not contain required headers `Name` and `Phone Number`.")
