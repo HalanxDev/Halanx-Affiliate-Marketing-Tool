@@ -4,19 +4,21 @@ import requests
 from decouple import config
 
 from referrals.utils import TENANT_LEAD_FIELDS_PRESENT_IN_TENANT_REFERRAL_FIELDS, SUCCESS, \
-    OWNER_LEAD_FIELDS_PRESENT_IN_OWNER_REFERRAL_FIELDS
+    OWNER_LEAD_FIELDS_PRESENT_IN_OWNER_REFERRAL_FIELDS, SOURCE_NAME, DATA
 from utility.response_utils import STATUS
 from utility.url_constants import TENANT_REFERRAL_CREATE_LEAD_API_URL, OWNER_REFERRAL_CREATE_LEAD_API_URL, \
     TENANT_REFERRAL_BULK_CREATE_LEAD_API_URL, OWNER_REFERRAL_BULK_CREATE_LEAD_API_URL
 
 
-def send_tenant_referral_to_lead_tool_to_generate_lead(referral):
+def send_tenant_referral_to_lead_tool_to_generate_lead(referral, referral_lead_source_name=''):
+    request_data = {SOURCE_NAME: referral_lead_source_name}
     data = {}
     for field in referral._meta.get_fields():
         if field.name in TENANT_LEAD_FIELDS_PRESENT_IN_TENANT_REFERRAL_FIELDS:
             data[field.name] = str(getattr(referral, field.name))
 
-    req = requests.post(TENANT_REFERRAL_CREATE_LEAD_API_URL, data=json.dumps(data),
+    request_data[DATA] = data
+    req = requests.post(TENANT_REFERRAL_CREATE_LEAD_API_URL, data=json.dumps(request_data),
                         headers={'Content-type': 'application/json'},
                         timeout=5,
                         auth=(config('LEAD_TOOL_ADMIN_USERNAME'), config('LEAD_TOOL_ADMIN_PASSWORD')))
@@ -27,13 +29,15 @@ def send_tenant_referral_to_lead_tool_to_generate_lead(referral):
             referral.save()
 
 
-def send_owner_referral_to_lead_tool_to_generate_lead(referral):
+def send_owner_referral_to_lead_tool_to_generate_lead(referral, referral_lead_source_name=''):
+    request_data = {SOURCE_NAME: referral_lead_source_name}
     data = {}
     for field in referral._meta.get_fields():
         if field.name in OWNER_LEAD_FIELDS_PRESENT_IN_OWNER_REFERRAL_FIELDS:
             data[field.name] = str(getattr(referral, field.name))
 
-    req = requests.post(OWNER_REFERRAL_CREATE_LEAD_API_URL, data=json.dumps(data),
+    request_data[DATA] = data
+    req = requests.post(OWNER_REFERRAL_CREATE_LEAD_API_URL, data=json.dumps(request_data),
                         headers={'Content-type': 'application/json'},
                         timeout=5,
                         auth=(config('LEAD_TOOL_ADMIN_USERNAME'), config('LEAD_TOOL_ADMIN_PASSWORD')))
@@ -44,7 +48,8 @@ def send_owner_referral_to_lead_tool_to_generate_lead(referral):
             referral.save()
 
 
-def send_tenant_csv_referral_to_lead_tool_to_generate_leads(tenant_referrals):
+def send_tenant_csv_referral_to_lead_tool_to_generate_leads(tenant_referrals, referral_lead_source_name=''):
+    request_data = {SOURCE_NAME: referral_lead_source_name}
     tenant_referral_detail_list = []
 
     for referral in tenant_referrals:
@@ -55,7 +60,8 @@ def send_tenant_csv_referral_to_lead_tool_to_generate_leads(tenant_referrals):
 
         tenant_referral_detail_list.append(data)
 
-    req = requests.post(TENANT_REFERRAL_BULK_CREATE_LEAD_API_URL, data=json.dumps(tenant_referral_detail_list),
+    request_data[DATA] = tenant_referral_detail_list
+    req = requests.post(TENANT_REFERRAL_BULK_CREATE_LEAD_API_URL, data=json.dumps(request_data),
                         headers={'Content-type': 'application/json'},
                         timeout=30,
                         auth=(config('LEAD_TOOL_ADMIN_USERNAME'), config('LEAD_TOOL_ADMIN_PASSWORD')))
@@ -68,7 +74,9 @@ def send_tenant_csv_referral_to_lead_tool_to_generate_leads(tenant_referrals):
             referral.save()
 
 
-def send_owner_csv_referral_to_lead_tool_to_generate_leads(owner_referrals):
+def send_owner_csv_referral_to_lead_tool_to_generate_leads(owner_referrals, referral_lead_source_name=''):
+    request_data = {SOURCE_NAME: referral_lead_source_name}
+
     owner_referral_detail_list = []
 
     for referral in owner_referrals:
@@ -79,7 +87,8 @@ def send_owner_csv_referral_to_lead_tool_to_generate_leads(owner_referrals):
 
         owner_referral_detail_list.append(data)
 
-    req = requests.post(OWNER_REFERRAL_BULK_CREATE_LEAD_API_URL, data=json.dumps(owner_referral_detail_list),
+    request_data[DATA] = owner_referral_detail_list
+    req = requests.post(OWNER_REFERRAL_BULK_CREATE_LEAD_API_URL, data=json.dumps(request_data),
                         headers={'Content-type': 'application/json'},
                         timeout=30,
                         auth=(config('LEAD_TOOL_ADMIN_USERNAME'), config('LEAD_TOOL_ADMIN_PASSWORD')))

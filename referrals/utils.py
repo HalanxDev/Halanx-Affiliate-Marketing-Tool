@@ -63,3 +63,10 @@ ReferralSourceChoices = (
 
 TENANT_LEAD_FIELDS_PRESENT_IN_TENANT_REFERRAL_FIELDS = ('name', 'gender', 'phone_no', 'email',  'accomodation_for')
 OWNER_LEAD_FIELDS_PRESENT_IN_OWNER_REFERRAL_FIELDS = ('name', 'gender', 'phone_no', 'email')
+
+DATA = 'data'
+SOURCE_NAME = 'source_name'
+
+AFFILIATE_QR = 'AFFILIATE - QR'
+AFFILIATE_FORM = 'AFFILIATE - FORM'
+AFFILIATE_CSV = 'AFFILIATE - CSV'

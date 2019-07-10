@@ -6,6 +6,7 @@ from affiliates.api.serializers import TenantReferralSerializer
 from affiliates.models import Affiliate
 from referrals.models import TenantReferral
 from referrals.tasks.tasks_affiliate_lead_management import send_tenant_referral_to_lead_tool_to_generate_lead
+from referrals.utils import AFFILIATE_QR
 
 
 class TenantReferralCreateView(CreateAPIView):
@@ -20,7 +21,8 @@ class TenantReferralCreateView(CreateAPIView):
             tenant_referral = serializer.save(affiliate=affiliate)
             # send referral details to lead tool
             try:
-                send_tenant_referral_to_lead_tool_to_generate_lead(tenant_referral)
+                send_tenant_referral_to_lead_tool_to_generate_lead(tenant_referral,
+                                                                   referral_lead_source_name=AFFILIATE_QR)
             except Exception as E:
                 print(E)
 

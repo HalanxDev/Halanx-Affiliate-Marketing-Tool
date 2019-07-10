@@ -35,7 +35,8 @@ from referrals.tasks.tasks_affiliate_lead_management import send_tenant_referral
     send_owner_referral_to_lead_tool_to_generate_lead, send_tenant_csv_referral_to_lead_tool_to_generate_leads, \
     send_owner_csv_referral_to_lead_tool_to_generate_leads
 from referrals.models import TenantReferral, HouseOwnerReferral
-from referrals.utils import TENANT_REFERRAL, DASHBOARD_FORM_SOURCE, HOUSE_OWNER_REFERRAL, DASHBOARD_BULK_UPLOAD_SOURCE
+from referrals.utils import TENANT_REFERRAL, DASHBOARD_FORM_SOURCE, HOUSE_OWNER_REFERRAL, DASHBOARD_BULK_UPLOAD_SOURCE, \
+    AFFILIATE_FORM, AFFILIATE_CSV
 from utility.form_field_utils import get_number, get_datetime
 from utility.random_utils import generate_random_code
 from utility.url_utils import build_url
@@ -300,7 +301,7 @@ def referral_upload_view(request):
                                                                 accomodation_type=accomodation_type,
                                                                 source=DASHBOARD_FORM_SOURCE)
                 try:
-                    send_tenant_referral_to_lead_tool_to_generate_lead(tenant_referral)
+                    send_tenant_referral_to_lead_tool_to_generate_lead(tenant_referral, AFFILIATE_FORM)
                 except Exception as E:
                     print(E, 'here')
                 messages.success(request, "Referral was submitted successfully.")
@@ -318,7 +319,8 @@ def referral_upload_view(request):
                                                                    bhk_count=bhk_count,
                                                                    house_type=house_type, source=DASHBOARD_FORM_SOURCE)
                 try:
-                    send_owner_referral_to_lead_tool_to_generate_lead(owner_referral)
+                    send_owner_referral_to_lead_tool_to_generate_lead(owner_referral,
+                                                                      referral_lead_source_name=AFFILIATE_FORM)
                 except Exception as E:
                     print(E, 'here')
                 messages.success(request, "Referral was submitted successfully.")
@@ -390,13 +392,14 @@ def referral_upload_csv_view(request):
 
             if referral_type == TENANT_REFERRAL:
                 try:
-                    send_tenant_csv_referral_to_lead_tool_to_generate_leads(tenant_referrals)
+                    send_tenant_csv_referral_to_lead_tool_to_generate_leads(tenant_referrals,
+                                                                            referral_lead_source_name=AFFILIATE_CSV)
                 except Exception as E:
                     print(E, traceback.print_exc())
 
             elif referral_type == HOUSE_OWNER_REFERRAL:
                 try:
-                    send_owner_csv_referral_to_lead_tool_to_generate_leads(owner_referrals)
+                    send_owner_csv_referral_to_lead_tool_to_generate_leads(owner_referrals, AFFILIATE_CSV)
                 except Exception as E:
                     print(E, traceback.print_exc())
 
