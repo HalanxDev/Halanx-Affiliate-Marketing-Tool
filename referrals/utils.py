@@ -65,8 +65,15 @@ TENANT_LEAD_FIELDS_PRESENT_IN_TENANT_REFERRAL_FIELDS = ('name', 'gender', 'phone
 OWNER_LEAD_FIELDS_PRESENT_IN_OWNER_REFERRAL_FIELDS = ('name', 'gender', 'phone_no', 'email')
 
 DATA = 'data'
+METADATA = 'metadata'
+
 SOURCE_NAME = 'source_name'
 
 AFFILIATE_QR = 'AFFILIATE - QR'
 AFFILIATE_FORM = 'AFFILIATE - FORM'
 AFFILIATE_CSV = 'AFFILIATE - CSV'
+
+
+TASK_TYPE = 'task_type'
+
+UPDATE_TENANT_LEAD_ACTIVITY_STATUS = 'update_tenant_lead_activity_status'
