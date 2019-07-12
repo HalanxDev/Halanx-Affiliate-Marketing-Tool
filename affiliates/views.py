@@ -31,9 +31,10 @@ from affiliates.models import Affiliate, AffiliateOccupationCategory, AffiliateO
 from affiliates.tokens import account_activation_token
 from affiliates.utils import send_account_verification_email, send_password_reset_email, get_referral_csv_upload_path, \
     get_or_create_monthly_report
-from referrals.tasks.tasks_affiliate_lead_management import send_tenant_referral_to_lead_tool_to_generate_lead, \
+from lead_affiliate.tasks.sending_tasks import send_tenant_referral_to_lead_tool_to_generate_lead, \
     send_owner_referral_to_lead_tool_to_generate_lead, send_tenant_csv_referral_to_lead_tool_to_generate_leads, \
     send_owner_csv_referral_to_lead_tool_to_generate_leads
+
 from referrals.models import TenantReferral, HouseOwnerReferral
 from referrals.utils import TENANT_REFERRAL, DASHBOARD_FORM_SOURCE, HOUSE_OWNER_REFERRAL, DASHBOARD_BULK_UPLOAD_SOURCE, \
     AFFILIATE_FORM, AFFILIATE_CSV

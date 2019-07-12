@@ -21,6 +21,9 @@ INSTALLED_APPS = [
     'affiliates',
     'referrals',
     'faqs',
+
+    # app to manage all tasks between lead tool and affiliate tool
+    'lead_affiliate',
 ]
 
 MIDDLEWARE = [
