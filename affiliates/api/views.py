@@ -42,6 +42,7 @@ class TenantReferralUpdateView(UpdateAPIView):
     permission_classes = (IsAdminUser, )
 
     def patch(self, request, *args, **kwargs):
+        print("tenant referral patch called")
         if self.request.data[TASK_TYPE] == UPDATE_TENANT_LEAD_ACTIVITY_STATUS:
             try:
                 instance = self.get_object()
