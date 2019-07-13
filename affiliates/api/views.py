@@ -43,15 +43,13 @@ class TenantReferralUpdateView(UpdateAPIView):
     permission_classes = (IsAdminUser,)
 
     def patch(self, request, *args, **kwargs):
-        print("tenant referral patch called")
         sentry_debug_logger.debug("tenant referral patch called with" + str(request.data))
+
         if self.request.data[TASK_TYPE] == UPDATE_TENANT_LEAD_ACTIVITY_STATUS:
             try:
                 instance = self.get_object()
-                sentry_debug_logger.debug('updating ' + str(instance))
                 instance.status = self.request.data[METADATA]['referral_status']
                 instance.save()
-                sentry_debug_logger.debug('status is ' + str(instance.status))
                 response_json = {STATUS: SUCCESS}
                 return JsonResponse(response_json, status=200)
             except Exception as E:
