@@ -10,6 +10,7 @@ from affiliates.models import Affiliate
 from referrals.models import TenantReferral
 # from referrals.tasks.tasks_affiliate_lead_management import send_tenant_referral_to_lead_tool_to_generate_lead
 from referrals.utils import AFFILIATE_QR, DATA, METADATA, SUCCESS, TASK_TYPE, UPDATE_TENANT_LEAD_ACTIVITY_STATUS
+from utility.logging_utils import sentry_debug_logger
 from utility.response_utils import STATUS, ERROR
 
 
@@ -38,17 +39,19 @@ class TenantReferralCreateView(CreateAPIView):
 
 class TenantReferralUpdateView(UpdateAPIView):
     queryset = TenantReferral.objects.all()
-    authentication_classes = (BasicAuthentication, )
-    permission_classes = (IsAdminUser, )
+    authentication_classes = (BasicAuthentication,)
+    permission_classes = (IsAdminUser,)
 
     def patch(self, request, *args, **kwargs):
         print("tenant referral patch called")
+        sentry_debug_logger.debug("tenant referral patch called with" + str(request.data))
         if self.request.data[TASK_TYPE] == UPDATE_TENANT_LEAD_ACTIVITY_STATUS:
             try:
                 instance = self.get_object()
-                print('updating ', instance)
+                sentry_debug_logger.debug('updating ' + str(instance))
                 instance.status = self.request.data[METADATA]['referral_status']
                 instance.save()
+                sentry_debug_logger.debug('status is ' + str(instance.status))
                 response_json = {STATUS: SUCCESS}
                 return JsonResponse(response_json, status=200)
             except Exception as E:
