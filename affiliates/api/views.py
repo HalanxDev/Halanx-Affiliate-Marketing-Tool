@@ -7,9 +7,10 @@ from rest_framework.response import Response
 
 from affiliates.api.serializers import TenantReferralSerializer
 from affiliates.models import Affiliate
-from referrals.models import TenantReferral
+from referrals.models import TenantReferral, HouseOwnerReferral
 # from referrals.tasks.tasks_affiliate_lead_management import send_tenant_referral_to_lead_tool_to_generate_lead
-from referrals.utils import AFFILIATE_QR, DATA, METADATA, SUCCESS, TASK_TYPE, UPDATE_TENANT_LEAD_ACTIVITY_STATUS
+from referrals.utils import AFFILIATE_QR, DATA, METADATA, SUCCESS, TASK_TYPE, UPDATE_TENANT_LEAD_ACTIVITY_STATUS, \
+    UPDATE_HOUSE_OWNER_LEAD_ACTIVITY_STATUS
 from utility.logging_utils import sentry_debug_logger
 from utility.response_utils import STATUS, ERROR
 
@@ -46,6 +47,24 @@ class TenantReferralUpdateView(UpdateAPIView):
         sentry_debug_logger.debug("tenant referral patch called with" + str(request.data))
 
         if self.request.data[TASK_TYPE] == UPDATE_TENANT_LEAD_ACTIVITY_STATUS:
+            try:
+                instance = self.get_object()
+                instance.status = self.request.data[METADATA]['referral_status']
+                instance.save()
+                response_json = {STATUS: SUCCESS}
+                return JsonResponse(response_json, status=200)
+            except Exception as E:
+                response_json = {STATUS: ERROR, 'message': str(E)}
+                return JsonResponse(response_json, status=400)
+
+
+class OwnerReferralUpdateView(UpdateAPIView):
+    queryset = HouseOwnerReferral.objects.all()
+    authentication_classes = (BasicAuthentication,)
+    permission_classes = (IsAdminUser,)
+
+    def patch(self, request, *args, **kwargs):
+        if self.request.data[TASK_TYPE] == UPDATE_HOUSE_OWNER_LEAD_ACTIVITY_STATUS:
             try:
                 instance = self.get_object()
                 instance.status = self.request.data[METADATA]['referral_status']

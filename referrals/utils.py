@@ -77,3 +77,4 @@ AFFILIATE_CSV = 'AFFILIATE - CSV'
 TASK_TYPE = 'task_type'
 
 UPDATE_TENANT_LEAD_ACTIVITY_STATUS = 'update_tenant_lead_activity_status'
+UPDATE_HOUSE_OWNER_LEAD_ACTIVITY_STATUS = 'update_house_owner_lead_activity_status'
