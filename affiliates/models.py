@@ -11,9 +11,10 @@ from affiliates.utils import default_profile_pic_url, \
     update_monthly_report_start_balance, QRCodeRequestStatusCategories, PENDING_APPROVAL
 from common.models import AddressDetail, BankDetail, Wallet
 from common.utils import PENDING, PaymentStatusCategories, PAID
-from referrals.utils import SUCCESS
+
 from utility.image_utils import compress_image
 from utility.random_utils import generate_random_code
+from utility.response_utils import SUCCESS
 
 
 class Affiliate(models.Model):
