@@ -5,7 +5,7 @@ from rest_framework.generics import CreateAPIView, get_object_or_404, UpdateAPIV
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 
-from affiliates.api.serializers import TenantReferralSerializer
+from affiliates.api.serializers import TenantReferralSerializer, HouseOwnerReferralSerializer
 from affiliates.models import Affiliate
 from referrals.models import TenantReferral, HouseOwnerReferral
 # from referrals.tasks.tasks_affiliate_lead_management import send_tenant_referral_to_lead_tool_to_generate_lead
@@ -30,6 +30,29 @@ class TenantReferralCreateView(CreateAPIView):
             try:
                 send_tenant_referral_to_lead_tool_to_generate_lead(tenant_referral,
                                                                    referral_lead_source_name=AFFILIATE_QR)
+            except Exception as E:
+                print(E)
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class HouseOwnerReferralCreateView(CreateAPIView):
+    serializer_class = HouseOwnerReferralSerializer
+    queryset = HouseOwnerReferral.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        from lead_affiliate.tasks.sending_tasks import send_owner_referral_to_lead_tool_to_generate_lead
+        affiliate_code = request.data.get('affiliate_code')
+        affiliate = get_object_or_404(Affiliate, unique_code=affiliate_code)
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            owner_referral = serializer.save(affiliate=affiliate)
+            # send referral details to lead tool
+            try:
+                send_owner_referral_to_lead_tool_to_generate_lead(owner_referral,
+                                                                  referral_lead_source_name=AFFILIATE_QR)
             except Exception as E:
                 print(E)
 
