@@ -14,4 +14,4 @@ class HouseOwnerReferralSerializer(serializers.ModelSerializer):
     class Meta:
         model = HouseOwnerReferral
         fields = '__all__'
-        read_only_fields = ('converted_at')
+        read_only_fields = ('converted_at', 'status', 'affiliate')
