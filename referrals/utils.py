@@ -39,6 +39,17 @@ HouseTypeCategories = (
     (VILLA, 'Villa'),
 )
 
+FULLY_FURNISHED = 'full'
+SEMI_FURNISHED = 'semi'
+UNFURNISHED = 'nil'
+
+HouseFurnishTypeCategories = (
+    (FULLY_FURNISHED, 'Fully furnished'),
+    (SEMI_FURNISHED, 'Semi furnished'),
+    (UNFURNISHED, 'Unfurnished')
+)
+
+
 PENDING = 'pending'
 SUCCESS = 'success'
 CANCELLED = 'cancelled'

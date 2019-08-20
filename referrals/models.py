@@ -4,7 +4,7 @@ from django.dispatch import receiver
 
 from affiliates.utils import get_or_create_monthly_report, update_monthly_report_start_balance
 from referrals.utils import GenderChoices, HouseAccomodationAllowedCategories, HouseAccomodationTypeCategories, \
-    ReferralStatusChoices, PENDING, ReferralSourceChoices, HouseTypeCategories
+    ReferralStatusChoices, PENDING, ReferralSourceChoices, HouseTypeCategories, HouseFurnishTypeCategories
 
 
 class Referral(models.Model):
@@ -42,8 +42,11 @@ class HouseOwnerReferral(Referral):
     affiliate = models.ForeignKey('affiliates.Affiliate', blank=True, null=True, on_delete=models.SET_NULL,
                                   related_name='house_owner_referrals')
     house_address = models.TextField(blank=True, null=True)
+    house_landmark = models.TextField(blank=True, null=True)
     house_type = models.CharField(max_length=20, blank=True, null=True, choices=HouseTypeCategories)
     bhk_count = models.PositiveIntegerField(default=1, blank=True, null=True)
+    expected_rent = models.FloatField(default=0, blank=True, null=True)
+    furnish_type = models.CharField(max_length=25, blank=True, null=True, choices=HouseFurnishTypeCategories)
 
 
 # noinspection PyUnusedLocal

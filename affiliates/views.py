@@ -314,11 +314,18 @@ def referral_upload_view(request):
                 house_address = data.get('house_address')
                 house_type = data.get('house_type')
                 bhk_count = data.get('bhk_count')
+                house_landmark = data.get('house_landmark')
+                expected_rent = get_number(data.get('expected_rent'))
+                furnish_type = data.get('furnish_type')
                 owner_referral = HouseOwnerReferral.objects.create(affiliate=affiliate, name=name, phone_no=phone_no,
                                                                    gender=gender,
                                                                    email=email, house_address=house_address,
                                                                    bhk_count=bhk_count,
-                                                                   house_type=house_type, source=DASHBOARD_FORM_SOURCE)
+                                                                   house_type=house_type,
+                                                                   house_landmark=house_landmark,
+                                                                   expected_rent=expected_rent,
+                                                                   furnish_type=furnish_type,
+                                                                   source=DASHBOARD_FORM_SOURCE)
                 try:
                     send_owner_referral_to_lead_tool_to_generate_lead(owner_referral,
                                                                       referral_lead_source_name=AFFILIATE_FORM)
